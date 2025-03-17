@@ -15,7 +15,7 @@ using static EFT.Player;
 
 namespace AmandsSense
 {
-    [BepInPlugin("com.Amanda.Sense", "Sense", "2.0.0")]
+    [BepInPlugin("com.Amanda.Sense", "Sense", "2.0.1.0")]
     public class AmandsSensePlugin : BaseUnityPlugin
     {
         public static GameObject Hook;
