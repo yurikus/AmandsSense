@@ -490,7 +490,7 @@ namespace AmandsSense
             while (!SendWeb.isDone)
                 await Task.Yield();
 
-            if (www.isNetworkError || www.isHttpError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
                 return null;
             }
@@ -525,7 +525,7 @@ namespace AmandsSense
             while (!SendWeb.isDone)
                 await Task.Yield();
 
-            if (www.isNetworkError || www.isHttpError)
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
                 return null;
             }
