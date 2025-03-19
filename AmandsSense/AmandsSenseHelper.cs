@@ -31,7 +31,12 @@ public class AmandsSenseHelper
     public static void Init()
     {
         LocalizedType = PatchConstants.EftTypes.Single((Type x) => x.GetMethod("ParseLocalization", BindingFlags.Static | BindingFlags.Public) != null);
-        LocalizedMethod = LocalizedType.GetMethods().First((MethodInfo x) => x.Name == "Localized" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(string) && x.GetParameters()[1].ParameterType == typeof(EStringCase));
+
+        LocalizedMethod = LocalizedType.GetMethods().First(
+            (MethodInfo x) => x.Name == "Localized" &&
+                x.GetParameters().Length == 2 &&
+                x.GetParameters()[0].ParameterType == typeof(string) &&
+                x.GetParameters()[1].ParameterType == typeof(EStringCase));
 
         BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
         RoleType = PatchConstants.EftTypes.Single((Type x) => x.GetMethod("IsBoss", flags) != null && x.GetMethod("Init", flags) != null);
@@ -49,58 +54,66 @@ public class AmandsSenseHelper
         ToColorMethod = ToColorType.GetMethods().First((MethodInfo x) => x.Name == "ToColor");
 
     }
+
     public static string Localized(string id, EStringCase @case)
     {
-        return (string)LocalizedMethod.Invoke(null, new object[]
+        return (string) LocalizedMethod.Invoke(null, new object[]
         {
             id,
             @case
         });
     }
+
     public static bool IsBoss(WildSpawnType role)
     {
-        return (bool)IsBossMethod.Invoke(null, new object[]
+        return (bool) IsBossMethod.Invoke(null, new object[]
         {
             role
         });
     }
+
     public static bool IsFollower(WildSpawnType role)
     {
-        return (bool)IsFollowerMethod.Invoke(null, new object[]
+        return (bool) IsFollowerMethod.Invoke(null, new object[]
         {
             role
         });
     }
+
     public static bool CountAsBossForStatistics(WildSpawnType role)
     {
-        return (bool)CountAsBossForStatisticsMethod.Invoke(null, new object[]
+        return (bool) CountAsBossForStatisticsMethod.Invoke(null, new object[]
         {
             role
         });
     }
+
     public static string GetScavRoleKey(WildSpawnType role)
     {
-        return (string)GetScavRoleKeyMethod.Invoke(null, new object[]
+        return (string) GetScavRoleKeyMethod.Invoke(null, new object[]
         {
             role
         });
     }
+
     public static string Transliterate(string text)
     {
-        return (string)TransliterateMethod.Invoke(null, new object[]
+        return (string) TransliterateMethod.Invoke(null, new object[]
         {
             text
         });
     }
+
     public static bool UsesFSR2Upscaler()
     {
-        return UsesFSR2UpscalerMethodFound ? (bool)UsesFSR2UpscalerMethod.Invoke(null, new object[]
+        return UsesFSR2UpscalerMethodFound ? (bool) UsesFSR2UpscalerMethod.Invoke(null, new object[]
         {
         }) : false;
     }
+
     public static Color ToColor(TaxonomyColor taxonomyColor)
     {
-        return (Color)ToColorMethod.Invoke(null, new object[]
+        return (Color) ToColorMethod.Invoke(null, new object[]
         {
             taxonomyColor
         });

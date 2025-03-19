@@ -1,17 +1,12 @@
-
-using SPT.Reflection.Patching;
 using BepInEx;
 using BepInEx.Configuration;
-using System.Reflection;
 using UnityEngine;
-using HarmonyLib;
-using EFT;
 using System.Threading.Tasks;
-using EFT.Interactive;
 using EFT.HealthSystem;
 using EFT.UI;
-using UnityEngine.SceneManagement;
-using static EFT.Player;
+
+using AmandsSense.Sense;
+using AmandsSense.Patches;
 
 namespace AmandsSense;
 
@@ -141,6 +136,7 @@ public class AmandsSensePlugin : BaseUnityPlugin
         AmandsSenseClass.SenseAudioSource = Hook.AddComponent<AudioSource>();
         DontDestroyOnLoad(Hook);
     }
+
     private void Start()
     {
         Version = Config.Bind("Versioning", "Version", "0.0.0", new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 1, ReadOnly = true, IsAdvanced = true }));
@@ -282,7 +278,8 @@ public class AmandsSensePlugin : BaseUnityPlugin
         MapsColor = Config.Bind("Colors", "MapsColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 20 }));
         MoneyColor = Config.Bind("Colors", "MoneyColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 10 }));
 
-        if (RequestDefaultValues) DefaultValues();
+        if (RequestDefaultValues)
+            DefaultValues();
 
         new AmandsPlayerPatch().Enable();
         new AmandsKillPatch().Enable();
@@ -291,82 +288,14 @@ public class AmandsSensePlugin : BaseUnityPlugin
 
         AmandsSenseHelper.Init();
     }
+
     private void DefaultValues()
     {
-        Size.Value = (float)Size.DefaultValue;
-        IconSize.Value = (float)IconSize.DefaultValue;
-        SizeClamp.Value = (float)SizeClamp.DefaultValue;
-        VerticalOffset.Value = (float)VerticalOffset.DefaultValue;
-        TextOffset.Value = (float)TextOffset.DefaultValue;
-        ExfilVerticalOffset.Value = (float)ExfilVerticalOffset.DefaultValue;
-    }
-}
-public class AmandsPlayerPatch : ModulePatch
-{
-    protected override MethodBase GetTargetMethod()
-    {
-        return typeof(Player).GetMethod("Init", BindingFlags.Instance | BindingFlags.Public);
-    }
-    [PatchPostfix]
-    private static void PatchPostFix(ref Player __instance)
-    {
-        if (__instance != null && __instance.IsYourPlayer)
-        {
-            AmandsSenseClass.Player = __instance;
-            AmandsSenseClass.inventoryControllerClass = Traverse.Create(__instance).Field("_inventoryController").GetValue<PlayerInventoryController>();
-            AmandsSenseClass.Clear();
-            AmandsSenseClass.scene = SceneManager.GetActiveScene().name;
-            AmandsSenseClass.ReloadFiles(true);
-        }
-    }
-}
-public class AmandsSensePrismEffectsPatch : ModulePatch
-{
-    protected override MethodBase GetTargetMethod()
-    {
-        return typeof(PrismEffects).GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.Public);
-    }
-    [PatchPostfix]
-    private static void PatchPostFix(ref PrismEffects __instance)
-    {
-        if (__instance.gameObject.name == "FPS Camera")
-        {
-            AmandsSenseClass.prismEffects = __instance;
-            __instance.debugDofPass = false;
-            __instance.dofForceEnableMedian = false;
-            __instance.dofBokehFactor = 157f;
-            __instance.dofFocusDistance = 2f;
-            __instance.dofNearFocusDistance = 100f;
-            __instance.dofRadius = 0f;
-        }
-    }
-}
-public class AmandsKillPatch : ModulePatch
-{
-    protected override MethodBase GetTargetMethod()
-    {
-        return typeof(Player).GetMethod("OnBeenKilledByAggressor", BindingFlags.Instance | BindingFlags.Public);
-    }
-    [PatchPostfix]
-    private static void PatchPostFix(ref Player __instance, Player aggressor, DamageInfoStruct damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
-    {
-        AmandsSenseClass.DeadPlayers.Add(new SenseDeadPlayerStruct(__instance, aggressor));
-    }
-}
-public class AmandsSenseExfiltrationPatch : ModulePatch
-{
-    protected override MethodBase GetTargetMethod()
-    {
-        return typeof(ExfiltrationPoint).GetMethod("Awake", BindingFlags.Instance | BindingFlags.Public);
-    }
-    [PatchPostfix]
-    private static void PatchPostFix(ref ExfiltrationPoint __instance)
-    {
-        GameObject amandsSenseExfiltrationGameObject = new GameObject("SenseExfil");
-        AmandsSenseExfil amandsSenseExfil = amandsSenseExfiltrationGameObject.AddComponent<AmandsSenseExfil>();
-        amandsSenseExfil.SetSense(__instance);
-        amandsSenseExfil.Construct();
-        amandsSenseExfil.ShowSense();
-        AmandsSenseClass.SenseExfils.Add(amandsSenseExfil);
+        Size.Value = (float) Size.DefaultValue;
+        IconSize.Value = (float) IconSize.DefaultValue;
+        SizeClamp.Value = (float) SizeClamp.DefaultValue;
+        VerticalOffset.Value = (float) VerticalOffset.DefaultValue;
+        TextOffset.Value = (float) TextOffset.DefaultValue;
+        ExfilVerticalOffset.Value = (float) ExfilVerticalOffset.DefaultValue;
     }
 }
