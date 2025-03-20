@@ -10,11 +10,14 @@ using AmandsSense.Patches;
 
 namespace AmandsSense;
 
-[BepInPlugin("com.Amanda.Sense", "Sense", "2.0.1.1")]
+[BepInPlugin("com.Amanda.Sense", "Sense", SenseVersion)]
 public class AmandsSensePlugin : BaseUnityPlugin
 {
+    public const string SenseVersion = "2.0.1.3";
+
     public static GameObject Hook;
     public static AmandsSenseClass AmandsSenseClassComponent;
+
     public static ConfigEntry<EEnableSense> EnableSense { get; set; }
     public static ConfigEntry<bool> EnableExfilSense { get; set; }
     public static ConfigEntry<bool> SenseAlwaysOn { get; set; }
@@ -130,7 +133,7 @@ public class AmandsSensePlugin : BaseUnityPlugin
 
     private void Awake()
     {
-        Debug.LogError("Sense Awake()");
+        //Debug.LogError("Sense Awake()");
         Hook = new GameObject("AmandsSense");
         AmandsSenseClassComponent = Hook.AddComponent<AmandsSenseClass>();
         AmandsSenseClass.SenseAudioSource = Hook.AddComponent<AudioSource>();
