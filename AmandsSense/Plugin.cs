@@ -1,19 +1,15 @@
+using AmandsSense.Patches;
+using AmandsSense.Sense;
 using BepInEx;
 using BepInEx.Configuration;
 using UnityEngine;
-using System.Threading.Tasks;
-using EFT.HealthSystem;
-using EFT.UI;
-
-using AmandsSense.Sense;
-using AmandsSense.Patches;
 
 namespace AmandsSense;
 
-[BepInPlugin("com.Amanda.Sense", "Sense", SenseVersion)]
+[BepInPlugin("com.Amanda.Sense", "Amand's Sense", SenseVersion)]
 public class AmandsSensePlugin : BaseUnityPlugin
 {
-    public const string SenseVersion = "2.0.1.3";
+    public const string SenseVersion = "2.0.1.4";
 
     public static GameObject Hook;
     public static AmandsSenseClass AmandsSenseClassComponent;
@@ -218,7 +214,7 @@ public class AmandsSensePlugin : BaseUnityPlugin
         TextColor = Config.Bind("Colors", "TextColor", new Color(0.84f, 0.88f, 0.95f, 1.0f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 550 }));
 
         RareItemsColor = Config.Bind("Colors", "RareItemsColor", new Color(1.0f, 0.01f, 0.01f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 540 }));
-        WishListItemsColor = Config.Bind("Colors", "WishListItemsColor", new Color(1.0f, 0.01f, 0.2f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 530 }));
+        WishListItemsColor = Config.Bind("Colors", "WishListItemsColor", new Color(0.867f, 0.0f, 1.0f, 1.0f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 530 }));
         NonFleaItemsColor = Config.Bind("Colors", "NonFleaItemsColor", new Color(1.0f, 0.12f, 0.01f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 520 }));
         KappaItemsColor = Config.Bind("Colors", "KappaItemsColor", new Color(1.0f, 1.0f, 0.01f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 510 }));
 

@@ -32,6 +32,7 @@ public class AmandsSenseItem : AmandsSenseConstructor
             // Weapon SenseItem Color, Sprite and Type
             Weapon weapon = observedLootItem.Item as Weapon;
             if (weapon != null)
+            {
                 switch (weapon.WeapClass)
                 {
                     case "assaultCarbine":
@@ -108,6 +109,7 @@ public class AmandsSenseItem : AmandsSenseConstructor
                         eSenseItemType = AmandsSenseClass.SenseItemType(observedLootItem.Item.GetType());
                         break;
                 }
+            }
             else
                 eSenseItemType = AmandsSenseClass.SenseItemType(observedLootItem.Item.GetType());
 
@@ -364,10 +366,11 @@ public class AmandsSenseItem : AmandsSenseConstructor
                 if (AmandsSensePlugin.EnableFlea.Value && !observedLootItem.Item.CanSellOnRagfair && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(observedLootItem.Item.TemplateId))
                     color = AmandsSensePlugin.NonFleaItemsColor.Value;
 
-                /*if (AmandsSenseClass.Player != null && AmandsSenseClass.Player.Profile != null && AmandsSenseClass.Player.Profile.WishList != null && AmandsSenseClass.Player.Profile.WishList.Contains(observedLootItem.Item.TemplateId))
+                var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
+                if (wm != null && wm.IsInWishlist(observedLootItem.Item.TemplateId, includeQol: true, out var wmGroup))
                 {
                     color = AmandsSensePlugin.WishListItemsColor.Value;
-                }*/
+                }
 
                 if (AmandsSenseClass.itemsJsonClass.RareItems != null)
                     if (AmandsSenseClass.itemsJsonClass.RareItems.Contains(observedLootItem.Item.TemplateId))

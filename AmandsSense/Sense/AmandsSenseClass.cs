@@ -73,6 +73,7 @@ public class AmandsSenseClass : MonoBehaviour
         BoxInteractiveLayerMask = LayerMask.GetMask("Interactive");
         BoxDeadbodyLayerMask = LayerMask.GetMask("Deadbody");
     }
+    
     public void Start()
     {
         itemsJsonClass = ReadFromJsonFile<ItemsJsonClass>(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sense/Items.json");
@@ -82,15 +83,23 @@ public class AmandsSenseClass : MonoBehaviour
 
         ReloadFiles(false);
     }
+    
     public void Update()
     {
         if (gameObject != null && Player != null && AmandsSensePlugin.EnableSense.Value != EEnableSense.Off)
         {
             if (CurrentOverlapLocation <= 8)
             {
-                int CurrentOverlapCountTest = Physics.OverlapBoxNonAlloc(Player.Position + SenseOverlapLocations[CurrentOverlapLocation] * (AmandsSensePlugin.Radius.Value * 2f / 3f), Vector3.one * (AmandsSensePlugin.Radius.Value * 2f / 3f), CurrentOverlapLoctionColliders, Quaternion.Euler(0f, 0f, 0f), BoxInteractiveLayerMask, QueryTriggerInteraction.Collide);
+                int CurrentOverlapCountTest = Physics.OverlapBoxNonAlloc(
+                    Player.Position + SenseOverlapLocations[CurrentOverlapLocation] * (AmandsSensePlugin.Radius.Value * 2f / 3f),
+                    Vector3.one * (AmandsSensePlugin.Radius.Value * 2f / 3f), 
+                    CurrentOverlapLoctionColliders, 
+                    Quaternion.Euler(0f, 0f, 0f), 
+                    BoxInteractiveLayerMask, 
+                    QueryTriggerInteraction.Collide);
 
                 for (int i = 0; i < CurrentOverlapCountTest; i++)
+                {
                     if (!SenseWorlds.ContainsKey(CurrentOverlapLoctionColliders[i].GetInstanceID()))
                     {
                         GameObject SenseWorldGameObject = new GameObject("SenseWorld");
@@ -98,11 +107,13 @@ public class AmandsSenseClass : MonoBehaviour
                         amandsSenseWorld.OwnerCollider = CurrentOverlapLoctionColliders[i];
                         amandsSenseWorld.OwnerGameObject = amandsSenseWorld.OwnerCollider.gameObject;
                         amandsSenseWorld.Id = amandsSenseWorld.OwnerCollider.GetInstanceID();
-                        amandsSenseWorld.Delay = Vector3.Distance(Player.Position, amandsSenseWorld.OwnerCollider.transform.position) / AmandsSensePlugin.Speed.Value;
+                        amandsSenseWorld.Delay = Math.Min(0, Vector3.Distance(Player.Position, amandsSenseWorld.OwnerCollider.transform.position) / AmandsSensePlugin.Speed.Value);
                         SenseWorlds.Add(amandsSenseWorld.Id, amandsSenseWorld);
                     }
                     else
                         SenseWorlds[CurrentOverlapLoctionColliders[i].GetInstanceID()].RestartSense();
+                }
+
                 CurrentOverlapLocation++;
             }
             else if (AmandsSensePlugin.SenseAlwaysOn.Value)
@@ -183,13 +194,14 @@ public class AmandsSenseClass : MonoBehaviour
         foreach (SenseDeadPlayerStruct deadPlayer in DeadPlayers)
         {
             if (Vector3.Distance(Player.Position, deadPlayer.victim.Position) < AmandsSensePlugin.DeadPlayerRadius.Value)
+            {
                 if (!SenseWorlds.ContainsKey(deadPlayer.victim.GetInstanceID()))
                 {
                     GameObject SenseWorldGameObject = new GameObject("SenseWorld");
                     AmandsSenseWorld amandsSenseWorld = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
                     amandsSenseWorld.OwnerGameObject = deadPlayer.victim.gameObject;
                     amandsSenseWorld.Id = deadPlayer.victim.GetInstanceID();
-                    amandsSenseWorld.Delay = Vector3.Distance(Player.Position, deadPlayer.victim.Position) / AmandsSensePlugin.Speed.Value;
+                    amandsSenseWorld.Delay = Math.Min(0, Vector3.Distance(Player.Position, deadPlayer.victim.Position) / AmandsSensePlugin.Speed.Value);
                     amandsSenseWorld.Lazy = false;
                     amandsSenseWorld.eSenseWorldType = ESenseWorldType.Deadbody;
                     amandsSenseWorld.SenseDeadPlayer = deadPlayer.victim as LocalPlayer;
@@ -197,6 +209,7 @@ public class AmandsSenseClass : MonoBehaviour
                 }
                 else
                     SenseWorlds[deadPlayer.victim.GetInstanceID()].RestartSense();
+            }
         }
     }
 
@@ -228,14 +241,16 @@ public class AmandsSenseClass : MonoBehaviour
             else
                 senseExfil.ShowSense();
         }
+
         if (AmandsSensePlugin.ExfilLightShadows.Value && ClosestAmandsSenseExfil != null && ClosestAmandsSenseExfil.light != null)
             ClosestAmandsSenseExfil.light.shadows = LightShadows.Hard;
     }
+
     public static void Clear()
     {
         foreach (KeyValuePair<int, AmandsSenseWorld> keyValuePair in SenseWorlds)
-            if (keyValuePair.Value != null)
-                keyValuePair.Value.RemoveSense();
+            keyValuePair.Value?.RemoveSense();
+
         SenseWorlds.Clear();
 
         ClosestAmandsSenseExfil = null;
@@ -243,6 +258,7 @@ public class AmandsSenseClass : MonoBehaviour
 
         DeadPlayers.Clear();
     }
+
     public static ESenseItemType SenseItemType(Type itemType)
     {
         if (TemplateIdToObjectMappingsClass.TypeTable["57864ada245977548638de91"].IsAssignableFrom(itemType))
@@ -331,8 +347,10 @@ public class AmandsSenseClass : MonoBehaviour
             return ESenseItemType.Maps;
         if (TemplateIdToObjectMappingsClass.TypeTable["543be5dd4bdc2deb348b4569"].IsAssignableFrom(itemType))
             return ESenseItemType.Money;
+
         return ESenseItemType.All;
     }
+
     public static void WriteToJsonFile<T>(string filePath, T objectToWrite, bool append = false) where T : new()
     {
         TextWriter writer = null;
@@ -348,6 +366,7 @@ public class AmandsSenseClass : MonoBehaviour
                 writer.Close();
         }
     }
+
     public static T ReadFromJsonFile<T>(string filePath) where T : new()
     {
         TextReader reader = null;
@@ -363,6 +382,7 @@ public class AmandsSenseClass : MonoBehaviour
                 reader.Close();
         }
     }
+
     public static void ReloadFiles(bool onlySounds)
     {
         if (onlySounds)
@@ -377,10 +397,12 @@ OnlySounds:
         foreach (string File in AudioFiles)
             LoadAudioClip(File);
     }
+
     async static void LoadSprite(string path)
     {
         LoadedSprites[Path.GetFileName(path)] = await RequestSprite(path);
     }
+    
     async static Task<Sprite> RequestSprite(string path)
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);
@@ -399,10 +421,12 @@ OnlySounds:
             return sprite;
         }
     }
+
     async static void LoadAudioClip(string path)
     {
         LoadedAudioClips[Path.GetFileName(path)] = await RequestAudioClip(path);
     }
+
     async static Task<AudioClip> RequestAudioClip(string path)
     {
         string extension = Path.GetExtension(path);

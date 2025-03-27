@@ -2,6 +2,7 @@
 using EFT;
 using System.Threading.Tasks;
 using EFT.Interactive;
+using System;
 
 namespace AmandsSense.Sense;
 
@@ -33,10 +34,13 @@ public class AmandsSenseWorld : MonoBehaviour
         enabled = false;
         WaitAndStart();
     }
+
     private async void WaitAndStart()
     {
         Waiting = true;
+
         await Task.Delay((int) (Delay * 1000));
+
         if (WaitingRemoveSense)
         {
             RemoveSense();
@@ -48,10 +52,12 @@ public class AmandsSenseWorld : MonoBehaviour
             RemoveSense();
             return;
         }
+
         if (Starting)
         {
             if (OwnerGameObject != null)
                 transform.position = OwnerGameObject.transform.position;
+
             if (HeightCheck())
             {
                 RemoveSense();
@@ -103,6 +109,7 @@ public class AmandsSenseWorld : MonoBehaviour
                 }
             }
             else
+            {
                 switch (eSenseWorldType)
                 {
                     case ESenseWorldType.Item:
@@ -118,6 +125,7 @@ public class AmandsSenseWorld : MonoBehaviour
                         amandsSenseConstructor.SetSense(SenseDeadPlayer);
                         break;
                 }
+            }
 
             // SenseWorld Starting Posittion
             switch (eSenseWorldType)
@@ -126,6 +134,7 @@ public class AmandsSenseWorld : MonoBehaviour
                 case ESenseWorldType.Container:
                     gameObject.transform.position = new Vector3(OwnerCollider.bounds.center.x, OwnerCollider.ClosestPoint(OwnerCollider.bounds.center + Vector3.up * 10f).y + AmandsSensePlugin.VerticalOffset.Value, OwnerCollider.bounds.center.z);
                     break;
+
                 case ESenseWorldType.Drawer:
                     if (OwnerCollider != null)
                     {
@@ -138,9 +147,9 @@ public class AmandsSenseWorld : MonoBehaviour
                         }
                     }
                     break;
+
                 case ESenseWorldType.Deadbody:
-                    if (amandsSenseConstructor != null)
-                        amandsSenseConstructor.UpdateSenseLocation();
+                    amandsSenseConstructor?.UpdateSenseLocation();
                     break;
             }
         }
@@ -155,8 +164,7 @@ public class AmandsSenseWorld : MonoBehaviour
             }
 
 
-            if (amandsSenseConstructor != null)
-                amandsSenseConstructor.UpdateSense();
+            amandsSenseConstructor?.UpdateSense();
 
             // SenseWorld Position
             switch (eSenseWorldType)
@@ -167,8 +175,7 @@ public class AmandsSenseWorld : MonoBehaviour
                 case ESenseWorldType.Container:
                     break;
                 case ESenseWorldType.Deadbody:
-                    if (amandsSenseConstructor != null)
-                        amandsSenseConstructor.UpdateSenseLocation();
+                    amandsSenseConstructor?.UpdateSenseLocation();
                     break;
                 case ESenseWorldType.Drawer:
                     break;
@@ -177,15 +184,17 @@ public class AmandsSenseWorld : MonoBehaviour
 
         Waiting = false;
     }
+
     public void RestartSense()
     {
         if (Waiting || UpdateIntensity)
             return;
 
         LifeSpan = 0f;
-        Delay = Vector3.Distance(AmandsSenseClass.Player.Position, gameObject.transform.position) / AmandsSensePlugin.Speed.Value;
+        Delay = Math.Min(0, Vector3.Distance(AmandsSenseClass.Player.Position, gameObject.transform.position) / AmandsSensePlugin.Speed.Value);
         WaitAndStart();
     }
+
     public bool HeightCheck()
     {
         switch (eSenseWorldType)
@@ -200,8 +209,7 @@ public class AmandsSenseWorld : MonoBehaviour
     }
     public void RemoveSense()
     {
-        if (amandsSenseConstructor != null)
-            amandsSenseConstructor.RemoveSense();
+        amandsSenseConstructor?.RemoveSense();
         AmandsSenseClass.SenseWorlds.Remove(Id);
         if (gameObject != null)
             Destroy(gameObject);
@@ -237,8 +245,7 @@ public class AmandsSenseWorld : MonoBehaviour
                 }
             }
 
-            if (amandsSenseConstructor != null)
-                amandsSenseConstructor.UpdateIntensity(Intensity);
+            amandsSenseConstructor?.UpdateIntensity(Intensity);
 
         }
         else if (!Starting && !Waiting)
@@ -247,7 +254,9 @@ public class AmandsSenseWorld : MonoBehaviour
             if (LifeSpan > AmandsSensePlugin.Duration.Value)
                 UpdateIntensity = true;
         }
+
         if (Camera.main != null)
+        {
             switch (eSenseWorldType)
             {
                 case ESenseWorldType.Item:
@@ -259,5 +268,6 @@ public class AmandsSenseWorld : MonoBehaviour
                 case ESenseWorldType.Drawer:
                     break;
             }
+        }
     }
 }

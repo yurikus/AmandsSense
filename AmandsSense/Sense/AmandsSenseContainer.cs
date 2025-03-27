@@ -30,7 +30,7 @@ public class AmandsSenseContainer : AmandsSenseConstructor
 
             // SenseContainer Items
             ESenseItemColor eSenseItemColor = ESenseItemColor.Default;
-            if (lootableContainer.ItemOwner != null && AmandsSenseClass.Player.Profile != null)// && AmandsSenseClass.Player.Profile.WishList != null)
+            if (lootableContainer.ItemOwner != null && AmandsSenseClass.Player.Profile != null)
             {
                 CompoundItem lootItemClass = lootableContainer.ItemOwner.RootItem as CompoundItem;
                 if (lootItemClass != null)
@@ -46,17 +46,25 @@ public class AmandsSenseContainer : AmandsSenseConstructor
                                     itemCount += 1;
                                     if (AmandsSenseClass.itemsJsonClass.RareItems.Contains(item.TemplateId))
                                         eSenseItemColor = ESenseItemColor.Rare;
-                                    /*else if (AmandsSenseClass.Player.Profile.WishList.Contains(item.TemplateId) && eSenseItemColor != ESenseItemColor.Rare)
+
+                                    if (eSenseItemColor != ESenseItemColor.Rare)
                                     {
-                                        eSenseItemColor = ESenseItemColor.WishList;
-                                    }*/
-                                    else if (item.Template != null && !item.Template.CanSellOnRagfair && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(item.TemplateId) && eSenseItemColor != ESenseItemColor.Rare && eSenseItemColor != ESenseItemColor.WishList)
+                                        var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
+                                        if (wm != null && wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                        {
+                                            eSenseItemColor = ESenseItemColor.WishList;
+                                        }
+                                    }
+
+                                    if (eSenseItemColor != ESenseItemColor.Rare && eSenseItemColor != ESenseItemColor.WishList && item.Template != null && !item.Template.CanSellOnRagfair && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(item.TemplateId))
+                                    {
                                         if (!AmandsSensePlugin.FleaIncludeAmmo.Value && TemplateIdToObjectMappingsClass.TypeTable["5485a8684bdc2da71d8b4567"].IsAssignableFrom(item.GetType()))
                                             continue;
                                         else if (AmandsSensePlugin.EnableFlea.Value)
                                             eSenseItemColor = ESenseItemColor.NonFlea;
                                         else if (AmandsSenseClass.itemsJsonClass.KappaItems.Contains(item.TemplateId) && eSenseItemColor == ESenseItemColor.Default)
                                             eSenseItemColor = ESenseItemColor.Kappa;
+                                    }
                                 }
                         }
                 }
@@ -163,7 +171,7 @@ public class AmandsSenseContainer : AmandsSenseConstructor
 
             // SenseContainer Items
             ESenseItemColor eSenseItemColor = ESenseItemColor.Default;
-            if (lootableContainer.ItemOwner != null && AmandsSenseClass.Player.Profile != null)// && AmandsSenseClass.Player.Profile.WishList != null)
+            if (lootableContainer.ItemOwner != null && AmandsSenseClass.Player.Profile != null)
             {
                 CompoundItem lootItemClass = lootableContainer.ItemOwner.RootItem as CompoundItem;
                 if (lootItemClass != null)
@@ -181,16 +189,16 @@ public class AmandsSenseContainer : AmandsSenseConstructor
                                     if (AmandsSenseClass.itemsJsonClass.RareItems.Contains(item.TemplateId))
                                         eSenseItemColor = ESenseItemColor.Rare;
 
-                                    /*else if (AmandsSenseClass.Player.Profile.WishList.Contains(item.TemplateId) && eSenseItemColor != ESenseItemColor.Rare)
+                                    if (eSenseItemColor != ESenseItemColor.Rare)
                                     {
-                                        eSenseItemColor = ESenseItemColor.WishList;
-                                    }*/
+                                        var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
+                                        if (wm != null && wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                        {
+                                            eSenseItemColor = ESenseItemColor.WishList;
+                                        }
+                                    }
 
-                                    else if (item.Template != null &&
-                                             !item.Template.CanSellOnRagfair &&
-                                             !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(item.TemplateId) &&
-                                             eSenseItemColor != ESenseItemColor.Rare &&
-                                             eSenseItemColor != ESenseItemColor.WishList)
+                                    if (eSenseItemColor != ESenseItemColor.Rare && eSenseItemColor != ESenseItemColor.WishList && item.Template != null && !item.Template.CanSellOnRagfair && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(item.TemplateId))
                                     {
                                         if (!AmandsSensePlugin.FleaIncludeAmmo.Value && TemplateIdToObjectMappingsClass.TypeTable["5485a8684bdc2da71d8b4567"].IsAssignableFrom(item.GetType()))
                                             continue;
