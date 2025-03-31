@@ -149,7 +149,8 @@ public class AmandsSenseWorld : MonoBehaviour
                     break;
 
                 case ESenseWorldType.Deadbody:
-                    amandsSenseConstructor?.UpdateSenseLocation();
+                    if (amandsSenseConstructor != null)
+                        amandsSenseConstructor.UpdateSenseLocation();
                     break;
             }
         }
@@ -163,9 +164,9 @@ public class AmandsSenseWorld : MonoBehaviour
                 return;
             }
 
-
-            amandsSenseConstructor?.UpdateSense();
-
+            if (amandsSenseConstructor != null)
+                amandsSenseConstructor.UpdateSense();
+            
             // SenseWorld Position
             switch (eSenseWorldType)
             {
@@ -175,7 +176,8 @@ public class AmandsSenseWorld : MonoBehaviour
                 case ESenseWorldType.Container:
                     break;
                 case ESenseWorldType.Deadbody:
-                    amandsSenseConstructor?.UpdateSenseLocation();
+                    if (amandsSenseConstructor != null)
+                        amandsSenseConstructor.UpdateSenseLocation();
                     break;
                 case ESenseWorldType.Drawer:
                     break;
@@ -209,7 +211,9 @@ public class AmandsSenseWorld : MonoBehaviour
     }
     public void RemoveSense()
     {
-        amandsSenseConstructor?.RemoveSense();
+        if (amandsSenseConstructor != null)
+            amandsSenseConstructor.RemoveSense();
+
         AmandsSenseClass.SenseWorlds.Remove(Id);
         if (gameObject != null)
             Destroy(gameObject);
@@ -245,8 +249,8 @@ public class AmandsSenseWorld : MonoBehaviour
                 }
             }
 
-            amandsSenseConstructor?.UpdateIntensity(Intensity);
-
+        if (amandsSenseConstructor != null)
+            amandsSenseConstructor.UpdateIntensity(Intensity);
         }
         else if (!Starting && !Waiting)
         {

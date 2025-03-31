@@ -49,10 +49,13 @@ public class AmandsSenseContainer : AmandsSenseConstructor
 
                                     if (eSenseItemColor != ESenseItemColor.Rare)
                                     {
-                                        var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
-                                        if (wm != null && wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                        if (AmandsSenseClass.Player != null && AmandsSenseClass.Player.Profile != null && AmandsSenseClass.Player.Profile.WishlistManager != null)
                                         {
-                                            eSenseItemColor = ESenseItemColor.WishList;
+                                            var wm = AmandsSenseClass.Player.Profile.WishlistManager;
+                                            if (wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                            {
+                                                eSenseItemColor = ESenseItemColor.WishList;
+                                            }
                                         }
                                     }
 
@@ -191,10 +194,13 @@ public class AmandsSenseContainer : AmandsSenseConstructor
 
                                     if (eSenseItemColor != ESenseItemColor.Rare)
                                     {
-                                        var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
-                                        if (wm != null && wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                        if (AmandsSenseClass.Player != null && AmandsSenseClass.Player.Profile != null && AmandsSenseClass.Player.Profile.WishlistManager != null)
                                         {
-                                            eSenseItemColor = ESenseItemColor.WishList;
+                                            var wm = AmandsSenseClass.Player.Profile.WishlistManager;
+                                            if (wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                            {
+                                                eSenseItemColor = ESenseItemColor.WishList;
+                                            }
                                         }
                                     }
 

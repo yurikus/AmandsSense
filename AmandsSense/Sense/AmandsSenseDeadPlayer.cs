@@ -76,10 +76,13 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
 
                                 if (eSenseItemColor != ESenseItemColor.Rare)
                                 {
-                                    var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
-                                    if (wm != null && wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                    if (AmandsSenseClass.Player != null && AmandsSenseClass.Player.Profile != null && AmandsSenseClass.Player.Profile.WishlistManager != null)
                                     {
-                                        eSenseItemColor = ESenseItemColor.WishList;
+                                        var wm = AmandsSenseClass.Player.Profile.WishlistManager;
+                                        if (wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                        {
+                                            eSenseItemColor = ESenseItemColor.WishList;
+                                        }
                                     }
                                 }
 
@@ -189,9 +192,9 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
             emptyDeadPlayer = false;
             ESenseItemColor eSenseItemColor = ESenseItemColor.Default;
 
-            if (AmandsSenseClass.Player?.Profile != null)
+            if (AmandsSenseClass.Player != null && AmandsSenseClass.Player.Profile != null)
             {
-                if (DeadPlayer?.Profile != null)
+                if (DeadPlayer != null && DeadPlayer.Profile != null)
                 {
                     object Inventory = Traverse.Create(DeadPlayer.Profile).Field("Inventory").GetValue();
                     if (Inventory != null)
@@ -206,8 +209,12 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
                             {
                                 if (item.Parent != null)
                                 {
-                                    if (item.Parent.Container?.ParentItem != null && TemplateIdToObjectMappingsClass.TypeTable["5448bf274bdc2dfc2f8b456a"].IsAssignableFrom(item.Parent.Container.ParentItem.GetType()))
+                                    if (item.Parent.Container != null &&
+                                        item.Parent.Container.ParentItem != null &&
+                                        TemplateIdToObjectMappingsClass.TypeTable["5448bf274bdc2dfc2f8b456a"].IsAssignableFrom(item.Parent.Container.ParentItem.GetType()))
+                                    {
                                         continue;
+                                    }
 
                                     Slot slot = item.Parent.Container as Slot;
                                     if (slot != null)
@@ -230,14 +237,23 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
 
                                 if (eSenseItemColor != ESenseItemColor.Rare)
                                 {
-                                    var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
-                                    if (wm != null && wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                    if (AmandsSenseClass.Player != null
+                                        && AmandsSenseClass.Player.Profile != null 
+                                        && AmandsSenseClass.Player.Profile.WishlistManager != null)
                                     {
-                                        eSenseItemColor = ESenseItemColor.WishList;
+                                        var wm = AmandsSenseClass.Player.Profile.WishlistManager;
+                                        if (wm.IsInWishlist(item.TemplateId, includeQol: true, out var wmGroup))
+                                        {
+                                            eSenseItemColor = ESenseItemColor.WishList;
+                                        }
                                     }
                                 }
 
-                                if (eSenseItemColor != ESenseItemColor.Rare && eSenseItemColor != ESenseItemColor.WishList && item.Template != null && !item.Template.CanSellOnRagfair && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(item.TemplateId))
+                                if (eSenseItemColor != ESenseItemColor.Rare 
+                                    && eSenseItemColor != ESenseItemColor.WishList 
+                                    && item.Template != null 
+                                    && !item.Template.CanSellOnRagfair 
+                                    && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(item.TemplateId))
                                 {
                                     if (!AmandsSensePlugin.FleaIncludeAmmo.Value && TemplateIdToObjectMappingsClass.TypeTable["5485a8684bdc2da71d8b4567"].IsAssignableFrom(item.GetType()))
                                         continue;

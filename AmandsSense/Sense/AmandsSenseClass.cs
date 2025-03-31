@@ -73,17 +73,19 @@ public class AmandsSenseClass : MonoBehaviour
         BoxInteractiveLayerMask = LayerMask.GetMask("Interactive");
         BoxDeadbodyLayerMask = LayerMask.GetMask("Deadbody");
     }
-    
+
     public void Start()
     {
         itemsJsonClass = ReadFromJsonFile<ItemsJsonClass>(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sense/Items.json");
 
-        itemsJsonClass?.Validate();
-        itemsJsonClass ??= new();
+        if (itemsJsonClass != null)
+            itemsJsonClass.Validate();
+        else
+            itemsJsonClass = new();
 
         ReloadFiles(false);
     }
-    
+
     public void Update()
     {
         if (gameObject != null && Player != null && AmandsSensePlugin.EnableSense.Value != EEnableSense.Off)
@@ -92,10 +94,10 @@ public class AmandsSenseClass : MonoBehaviour
             {
                 int CurrentOverlapCountTest = Physics.OverlapBoxNonAlloc(
                     Player.Position + SenseOverlapLocations[CurrentOverlapLocation] * (AmandsSensePlugin.Radius.Value * 2f / 3f),
-                    Vector3.one * (AmandsSensePlugin.Radius.Value * 2f / 3f), 
-                    CurrentOverlapLoctionColliders, 
-                    Quaternion.Euler(0f, 0f, 0f), 
-                    BoxInteractiveLayerMask, 
+                    Vector3.one * (AmandsSensePlugin.Radius.Value * 2f / 3f),
+                    CurrentOverlapLoctionColliders,
+                    Quaternion.Euler(0f, 0f, 0f),
+                    BoxInteractiveLayerMask,
                     QueryTriggerInteraction.Collide);
 
                 for (int i = 0; i < CurrentOverlapCountTest; i++)
@@ -402,7 +404,7 @@ OnlySounds:
     {
         LoadedSprites[Path.GetFileName(path)] = await RequestSprite(path);
     }
-    
+
     async static Task<Sprite> RequestSprite(string path)
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);

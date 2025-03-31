@@ -9,7 +9,7 @@ namespace AmandsSense;
 [BepInPlugin("com.Amanda.Sense", "Amand's Sense", SenseVersion)]
 public class AmandsSensePlugin : BaseUnityPlugin
 {
-    public const string SenseVersion = "2.0.1.4";
+    public const string SenseVersion = "2.0.2";
 
     public static GameObject Hook;
     public static AmandsSenseClass AmandsSenseClassComponent;

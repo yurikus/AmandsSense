@@ -366,10 +366,15 @@ public class AmandsSenseItem : AmandsSenseConstructor
                 if (AmandsSensePlugin.EnableFlea.Value && !observedLootItem.Item.CanSellOnRagfair && !AmandsSenseClass.itemsJsonClass.NonFleaExclude.Contains(observedLootItem.Item.TemplateId))
                     color = AmandsSensePlugin.NonFleaItemsColor.Value;
 
-                var wm = AmandsSenseClass.Player?.Profile?.WishlistManager;
-                if (wm != null && wm.IsInWishlist(observedLootItem.Item.TemplateId, includeQol: true, out var wmGroup))
+                if (AmandsSenseClass.Player != null
+                    && AmandsSenseClass.Player.Profile != null
+                    && AmandsSenseClass.Player.Profile.WishlistManager != null)
                 {
-                    color = AmandsSensePlugin.WishListItemsColor.Value;
+                    var wm = AmandsSenseClass.Player.Profile.WishlistManager;
+                    if (wm.IsInWishlist(observedLootItem.Item.TemplateId, includeQol: true, out var wmGroup))
+                    {
+                        color = AmandsSensePlugin.WishListItemsColor.Value;
+                    }
                 }
 
                 if (AmandsSenseClass.itemsJsonClass.RareItems != null)
