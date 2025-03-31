@@ -251,7 +251,10 @@ public class AmandsSenseClass : MonoBehaviour
     public static void Clear()
     {
         foreach (KeyValuePair<int, AmandsSenseWorld> keyValuePair in SenseWorlds)
-            keyValuePair.Value?.RemoveSense();
+        {
+            if (keyValuePair.Value != null)
+                keyValuePair.Value.RemoveSense();
+        }
 
         SenseWorlds.Clear();
 
