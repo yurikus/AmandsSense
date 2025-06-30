@@ -8,14 +8,10 @@ using UnityEngine;
 
 namespace AmandsSense;
 
-[BepInPlugin("com.Amanda.Sense", "Amand's Sense", SenseVersion)]
+[BepInPlugin("com.Amanda.Sense", "Amand's Sense", BuildInfo.ModVersion)]
 public class Plugin : BaseUnityPlugin
 {
-    public const string SenseVersion = "3.0.0";
-
     public static ManualLogSource Log;
-    //public static GameObject Hook;
-    //public static AmandsSenseClass AmandsSenseClassComponent;
 
     public static ConfigEntry<EEnableSense> EnableSense { get; set; }
     public static ConfigEntry<bool> EnableExfilSense { get; set; }

@@ -32,7 +32,6 @@ public class AmandsSenseItem : AmandsSenseConstructor
             return;
         }
 
-        // Why? Seems to be unused
         AmandsSenseClass.SenseItems.Add(observedLootItem.Item);
 
         ItemId = observedLootItem.ItemId;

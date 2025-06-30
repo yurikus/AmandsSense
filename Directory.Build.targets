@@ -1,0 +1,16 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetName>$(MSBuildProjectName)-v$(Version)</TargetName>
+    <TargetName Condition="'$(InformationalVersion)' != ''">$(TargetName)-$(InformationalVersion)</TargetName>
+  </PropertyGroup>
+
+  <Target Name="GenerateBuildInfo" BeforeTargets="BeforeCompile">
+    <WriteLinesToFile
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true"
+      File="BuildInfo.cs"
+      Lines="public static class BuildInfo  {  public const string ModVersion = &quot;$(Version)&quot;%3B  }" />
+  </Target>
+
+</Project>
