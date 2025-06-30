@@ -2,6 +2,8 @@
 using AmandsSense.Sense;
 using EFT;
 using SPT.Reflection.Patching;
+using UnityEngine.SceneManagement;
+using static EFT.Player;
 
 namespace AmandsSense.Patches;
 
@@ -41,8 +43,13 @@ public class GameWorldStartedPostfixPatch : ModulePatch
         if (GameWorldAwakePrefixPatch.IsHideout)
             return;
 
-        AmandsSenseClass.Player = __instance.MainPlayer;
         Plugin.Log.LogInfo($"Found local player: {__instance.MainPlayer.ProfileId}");
+
+        AmandsSenseClass.Player = __instance.MainPlayer;
+        AmandsSenseClass.inventoryControllerClass = (PlayerInventoryController) AmandsSenseClass.Player.InventoryController;
+        AmandsSenseClass.Clear();
+        AmandsSenseClass.scene = SceneManager.GetActiveScene().name;
+        AmandsSenseClass.ReloadFiles();
 
         if (__instance.LocationId.Contains("factory"))
         {
@@ -66,9 +73,12 @@ public class GameWorldDisposePostfixPatch : ModulePatch
     }
 
     [PatchPostfix]
-    public static void Prefix()
+    public static void Postfix()
     {
         Plugin.Log.LogInfo("Disposing of static & long lived objects.");
+
+        AmandsSenseClass.inventoryControllerClass = null;
+        AmandsSenseClass.Player = null;
 
         //Singleton<DecalPainter>.Release(Singleton<DecalPainter>.Instance);
         //Singleton<ImpactController>.Release(Singleton<ImpactController>.Instance);

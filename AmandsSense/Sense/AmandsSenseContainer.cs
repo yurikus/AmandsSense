@@ -41,15 +41,15 @@ public class AmandsSenseContainer : AmandsSenseConstructor
         ESenseItemColor eSenseItemColor = ESenseItemColor.Default;
         if (lootableContainer.ItemOwner != null && AmandsSenseClass.Player.Profile != null)
         {
-            CompoundItem lootItemClass = lootableContainer.ItemOwner.RootItem as CompoundItem;
+            var lootItemClass = lootableContainer.ItemOwner.RootItem as CompoundItem;
             if (lootItemClass != null)
             {
-                object[] Grids = Traverse.Create(lootItemClass).Field("Grids").GetValue<object[]>();
+                var Grids = lootItemClass.Grids;
                 if (Grids != null)
                 {
-                    foreach (object grid in Grids)
+                    foreach (var grid in Grids)
                     {
-                        IEnumerable<Item> Items = Traverse.Create(grid).Property("Items").GetValue<IEnumerable<Item>>();
+                        var Items = grid.Items;
                         if (Items != null)
                         {
                             foreach (Item item in Items)
@@ -182,15 +182,15 @@ public class AmandsSenseContainer : AmandsSenseConstructor
         ESenseItemColor eSenseItemColor = ESenseItemColor.Default;
         if (lootableContainer.ItemOwner != null && AmandsSenseClass.Player.Profile != null)
         {
-            CompoundItem lootItemClass = lootableContainer.ItemOwner.RootItem as CompoundItem;
+            var lootItemClass = lootableContainer.ItemOwner.RootItem as CompoundItem;
             if (lootItemClass != null)
             {
-                object[] Grids = Traverse.Create(lootItemClass).Field("Grids").GetValue<object[]>();
+                var Grids = lootItemClass.Grids;
                 if (Grids != null)
                 {
-                    foreach (object grid in Grids)
+                    foreach (var grid in Grids)
                     {
-                        IEnumerable<Item> Items = Traverse.Create(grid).Property("Items").GetValue<IEnumerable<Item>>();
+                        var Items = grid.Items;
                         if (Items != null)
                         {
                             foreach (Item item in Items)

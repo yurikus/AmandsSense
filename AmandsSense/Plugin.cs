@@ -59,12 +59,6 @@ public class Plugin : BaseUnityPlugin
     public static ConfigEntry<float> ExfilLightRange { get; set; }
     public static ConfigEntry<bool> ExfilLightShadows { get; set; }
 
-    public static ConfigEntry<float> AudioDistance { get; set; }
-    public static ConfigEntry<int> AudioRolloff { get; set; }
-    public static ConfigEntry<float> AudioVolume { get; set; }
-    public static ConfigEntry<float> ContainerAudioVolume { get; set; }
-    public static ConfigEntry<float> ActivateSenseVolume { get; set; }
-
     public static ConfigEntry<bool> useDof { get; set; }
 
     public static ConfigEntry<Color> ExfilColor { get; set; }
@@ -132,10 +126,6 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Log = Logger;
-        //Hook = new GameObject("AmandsSense");
-        //AmandsSenseClassComponent = Hook.AddComponent<AmandsSenseClass>();
-        //AmandsSenseClass.SenseAudioSource = Hook.AddComponent<AudioSource>();
-        //DontDestroyOnLoad(Hook);
     }
 
     private void Start()
@@ -201,13 +191,8 @@ public class Plugin : BaseUnityPlugin
         ExfilLightRange = Config.Bind("AmandsSense", "Exfil LightRange", 50f, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 150 }));
         ExfilLightShadows = Config.Bind("AmandsSense", "Exfil LightShadows", true, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 140 }));
 
-        AudioDistance = Config.Bind("AmandsSense", "AudioDistance", 99f, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 130, IsAdvanced = true }));
-        AudioRolloff = Config.Bind("AmandsSense", "AudioRolloff", 100, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 120, IsAdvanced = true }));
-        AudioVolume = Config.Bind("AmandsSense", "AudioVolume", 0.5f, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 112 }));
-        ContainerAudioVolume = Config.Bind("AmandsSense", "ContainerAudioVolume", 0.5f, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 110 }));
-
         useDof = Config.Bind("AmandsSense Effects", "useDof", true, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 100 }));
-        
+
         ExfilColor = Config.Bind("Colors", "ExfilColor", new Color(0.01f, 1.0f, 0.01f, 1.0f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 570 }));
         ExfilUnmetColor = Config.Bind("Colors", "ExfilUnmetColor", new Color(1.0f, 0.01f, 0.01f, 1.0f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 560 }));
 
@@ -276,7 +261,7 @@ public class Plugin : BaseUnityPlugin
         SpecialEquipmentColor = Config.Bind("Colors", "SpecialEquipmentColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 30 }));
         MapsColor = Config.Bind("Colors", "MapsColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 20 }));
         MoneyColor = Config.Bind("Colors", "MoneyColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 10 }));
-        
+
         if (RequestDefaultValues)
             DefaultValues();
 
@@ -287,20 +272,16 @@ public class Plugin : BaseUnityPlugin
     {
         try
         {
-
             new GameWorldDisposePostfixPatch().Enable();
             new GameWorldAwakePrefixPatch().Enable();
             new GameWorldStartedPostfixPatch().Enable();
 
-
-            //new AmandsPlayerPatch().Enable();
-            //new AmandsKillPatch().Enable();
-            //new AmandsSenseExfiltrationPatch().Enable();
-            //new AmandsSensePrismEffectsPatch().Enable();
-
-            //AmandsSenseHelper.Init();
+            new AmandsKillPatch().Enable();
+            new AmandsSenseExfiltrationPatch().Enable();
+            new AmandsSensePrismEffectsPatch().Enable();
         }
-        catch (Exception ex){ 
+        catch (Exception ex)
+        {
             Log.LogError("AS: EXCEPTION: " + ex.Message + "\r\n" + ex.StackTrace);
         }
     }

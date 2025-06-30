@@ -32,6 +32,7 @@ public class AmandsSenseItem : AmandsSenseConstructor
             return;
         }
 
+        // Why? Seems to be unused
         AmandsSenseClass.SenseItems.Add(observedLootItem.Item);
 
         ItemId = observedLootItem.ItemId;
@@ -424,6 +425,7 @@ public class AmandsSenseItem : AmandsSenseConstructor
                 nameText.text = "<b>???</b>";
                 nameText.color = new Color(textColor.r, textColor.g, textColor.b, 0f);
             }
+
             // SenseItem Unexamined Description
             if (descriptionText != null)
             {
@@ -456,7 +458,7 @@ public class AmandsSenseItem : AmandsSenseConstructor
                 KeyComponent keyComponent;
                 if (observedLootItem.Item.TryGetItemComponent(out keyComponent))
                 {
-                    int MaximumNumberOfUsage = Traverse.Create(Traverse.Create(keyComponent).Field("Template").GetValue<object>()).Field("MaximumNumberOfUsage").GetValue<int>();
+                    int MaximumNumberOfUsage = keyComponent.Template.MaximumNumberOfUsage;
                     descriptionText.text = MaximumNumberOfUsage - keyComponent.NumberOfUsages + "/" + MaximumNumberOfUsage;
                 }
                 MedKitComponent medKitComponent;
