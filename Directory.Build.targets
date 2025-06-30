@@ -1,8 +1,23 @@
 <Project>
+  
+  <!-- SPT install directory -->
+  <PropertyGroup>
+    <SPTBaseDir>C:\GM\Tarkov\SPT\SPT-4.0.0-37759-20250627-f822ef5</SPTBaseDir>
+  </PropertyGroup>
 
   <PropertyGroup>
-    <TargetName>$(MSBuildProjectName)-v$(Version)</TargetName>
-    <TargetName Condition="'$(InformationalVersion)' != ''">$(TargetName)-$(InformationalVersion)</TargetName>
+    <ClientModPath>$([MSBuild]::NormalizePath($(SPTBaseDir)/BepInEx/plugins/))</ClientModPath>
+    <TargetNameDebug>$(MSBuildProjectName)-debug</TargetNameDebug>
+    <TargetNameRelease>$(MSBuildProjectName)-v$(Version)</TargetNameRelease>
+    <TargetNameRelease Condition="'$(InformationalVersion)' != ''">$(TargetNameRelease)-$(InformationalVersion)</TargetNameRelease>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TargetName>$(TargetNameDebug)</TargetName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TargetName>$(TargetNameRelease)</TargetName>
   </PropertyGroup>
 
   <Target Name="GenerateBuildInfo" BeforeTargets="BeforeCompile">
@@ -11,6 +26,23 @@
       WriteOnlyWhenDifferent="true"
       File="BuildInfo.cs"
       Lines="public static class BuildInfo  {  public const string ModVersion = &quot;$(Version)&quot;%3B  }" />
+  </Target>
+
+  <Target Name="RemoveOtherConfigurationDLL" BeforeTargets="CopyServerOutputToSPT">
+    <Delete Condition="'$(Configuration)' == 'Debug'" Files="$(ClientModPath)$(TargetNameRelease).dll" />
+    <Message Condition="'$(Configuration)' == 'Debug'" Text="Deleted $(ClientModPath)$(TargetNameRelease).dll" Importance="high" />
+
+    <Delete Condition="'$(Configuration)' == 'Release'" Files="$(ClientModPath)$(TargetNameDebug).dll" />
+    <Message Condition="'$(Configuration)' == 'Release'" Text="Deleted $(ClientModPath)$(TargetNameDebug).dll" Importance="high" />
+  </Target>
+
+  <Target Name="CopyServerOutputToSPT" AfterTargets="Build">
+    <ItemGroup>
+      <Artifacts Include="$(OutDir)$(TargetName).dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(Artifacts)" DestinationFolder="$(ClientModPath)" OverwriteReadOnlyFiles="true" />
+    <Message Text="Deployed $(TargetName) -&gt; $(ClientModPath)" Importance="high" />
   </Target>
 
 </Project>

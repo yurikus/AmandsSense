@@ -6,7 +6,6 @@
     <InformationalVersion>pre01</InformationalVersion>
     <Company>Amanda</Company>
     <AssemblyName>Amand's Sense</AssemblyName>
-    <Description>Amand's Sense</Description>
     <Product>SPT 4.0, EFT 0.16.7.1.37759</Product>
     <Copyright>Copyright © 2022-2025 Amanda. All rights reserved.</Copyright>
   </PropertyGroup>
@@ -15,6 +14,7 @@
     <TargetFramework>net471</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>AmandsSense</RootNamespace>
+    <TargetName>AmandsSense</TargetName>
     <Deterministic>true</Deterministic>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -31,20 +31,6 @@
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-
-  <Target Name="CopyServerOutputToSPT" AfterTargets="Build">
-    <PropertyGroup>
-      <ClientModPath>../../../BepInEx/plugins/</ClientModPath>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <Artifacts Include="$(OutDir)$(TargetName).dll" />
-    </ItemGroup>
-
-    <Copy SourceFiles="@(Artifacts)" DestinationFolder="$(ClientModPath)" OverwriteReadOnlyFiles="true" />
-
-    <Message Text="$(TargetName) -&gt; $(ClientModPath)" Importance="high" />
-  </Target>
 
   <PropertyGroup>
     <AssemblySearchPaths>
