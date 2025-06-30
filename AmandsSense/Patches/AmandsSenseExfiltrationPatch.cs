@@ -10,13 +10,13 @@ public class AmandsSenseExfiltrationPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(ExfiltrationPoint).GetMethod("Awake", BindingFlags.Instance | BindingFlags.Public);
+        return typeof(ExfiltrationPoint).GetMethod(nameof(ExfiltrationPoint.Awake), BindingFlags.Instance | BindingFlags.Public);
     }
 
     [PatchPostfix]
     private static void PatchPostFix(ref ExfiltrationPoint __instance)
     {
-        GameObject amandsSenseExfiltrationGameObject = new GameObject("SenseExfil");
+        var amandsSenseExfiltrationGameObject = new GameObject("SenseExfil");
         AmandsSenseExfil amandsSenseExfil = amandsSenseExfiltrationGameObject.AddComponent<AmandsSenseExfil>();
         amandsSenseExfil.SetSense(__instance);
         amandsSenseExfil.Construct();

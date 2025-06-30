@@ -1,14 +1,13 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using EFT;
 using EFT.InventoryLogic;
-using System.IO;
-using System.Threading.Tasks;
-using UnityEngine.Networking;
-using System.Linq;
 using SPT.Common.Utils;
-using Sirenix.Utilities;
+using UnityEngine;
+using UnityEngine.Networking;
 using static EFT.Player;
 
 namespace AmandsSense.Sense;
@@ -28,17 +27,17 @@ public class AmandsSenseClass : MonoBehaviour
     public static float Radius = 0f;
 
     public static PrismEffects prismEffects;
-
     public static ItemsJsonClass itemsJsonClass;
 
     public static float lastDoubleClickTime = 0.0f;
+    public static Dictionary<string, Sprite> LoadedSprites = [];
 
-    public static AudioSource SenseAudioSource;
+    public static Vector3[] SenseOverlapLocations = [
+        Vector3.zero, Vector3.forward, Vector3.back, Vector3.left, Vector3.right,
+        Vector3.forward + Vector3.left, Vector3.forward + Vector3.right,
+        Vector3.back + Vector3.left, Vector3.back + Vector3.right
+    ];
 
-    public static Dictionary<string, Sprite> LoadedSprites = new Dictionary<string, Sprite>();
-    public static Dictionary<string, AudioClip> LoadedAudioClips = new Dictionary<string, AudioClip>();
-
-    public static Vector3[] SenseOverlapLocations = new Vector3[9] { Vector3.zero, Vector3.forward, Vector3.back, Vector3.left, Vector3.right, Vector3.forward + Vector3.left, Vector3.forward + Vector3.right, Vector3.back + Vector3.left, Vector3.back + Vector3.right };
     public static int CurrentOverlapLocation = 9;
 
     public static LayerMask BoxInteractiveLayerMask;
@@ -46,25 +45,17 @@ public class AmandsSenseClass : MonoBehaviour
     public static int[] CurrentOverlapCount = new int[9];
     public static Collider[] CurrentOverlapLoctionColliders = new Collider[100];
 
-    public static Dictionary<int, AmandsSenseWorld> SenseWorlds = new Dictionary<int, AmandsSenseWorld>();
+    public static Dictionary<int, AmandsSenseWorld> SenseWorlds = [];
+    public static List<SenseDeadPlayerStruct> DeadPlayers = [];
 
-    public static List<SenseDeadPlayerStruct> DeadPlayers = new List<SenseDeadPlayerStruct>();
-
-    public static List<AmandsSenseExfil> SenseExfils = new List<AmandsSenseExfil>();
+    public static List<AmandsSenseExfil> SenseExfils = [];
     public static AmandsSenseExfil ClosestAmandsSenseExfil = null;
 
-    public static List<Item> SenseItems = new List<Item>();
-
+    public static List<Item> SenseItems = [];
     public static Transform parent;
-
     public static string scene;
-    public void OnGUI()
-    {
-        /*GUILayout.BeginArea(new Rect(20, 10, 1280, 720));
-        GUILayout.Label("SenseWorlds " + SenseWorlds.Count().ToString());
-        GUILayout.EndArea();*/
-    }
-    private void Awake()
+
+    public void Awake()
     {
         LowLayerMask = LayerMask.GetMask("Terrain", "LowPolyCollider", "HitCollider");
         HighLayerMask = LayerMask.GetMask("Terrain", "HighPolyCollider", "HitCollider");
@@ -72,10 +63,7 @@ public class AmandsSenseClass : MonoBehaviour
 
         BoxInteractiveLayerMask = LayerMask.GetMask("Interactive");
         BoxDeadbodyLayerMask = LayerMask.GetMask("Deadbody");
-    }
 
-    public void Start()
-    {
         itemsJsonClass = ReadFromJsonFile<ItemsJsonClass>(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sense/Items.json");
 
         if (itemsJsonClass != null)
@@ -83,143 +71,148 @@ public class AmandsSenseClass : MonoBehaviour
         else
             itemsJsonClass = new();
 
-        ReloadFiles(false);
+        ReloadFiles();
     }
+
 
     public void Update()
     {
-        if (gameObject != null && Player != null && AmandsSensePlugin.EnableSense.Value != EEnableSense.Off)
+        if (gameObject == null || Player == null || Plugin.EnableSense.Value == EEnableSense.Off)
+            return;
+
+        if (CurrentOverlapLocation <= 8)
         {
-            if (CurrentOverlapLocation <= 8)
+            int CurrentOverlapCountTest = Physics.OverlapBoxNonAlloc(
+                Player.Position + SenseOverlapLocations[CurrentOverlapLocation] * (Plugin.Radius.Value * 2f / 3f),
+                Vector3.one * (Plugin.Radius.Value * 2f / 3f),
+                CurrentOverlapLoctionColliders,
+                Quaternion.Euler(0f, 0f, 0f),
+                BoxInteractiveLayerMask,
+                QueryTriggerInteraction.Collide);
+
+            for (int i = 0; i < CurrentOverlapCountTest; i++)
             {
-                int CurrentOverlapCountTest = Physics.OverlapBoxNonAlloc(
-                    Player.Position + SenseOverlapLocations[CurrentOverlapLocation] * (AmandsSensePlugin.Radius.Value * 2f / 3f),
-                    Vector3.one * (AmandsSensePlugin.Radius.Value * 2f / 3f),
-                    CurrentOverlapLoctionColliders,
-                    Quaternion.Euler(0f, 0f, 0f),
-                    BoxInteractiveLayerMask,
-                    QueryTriggerInteraction.Collide);
-
-                for (int i = 0; i < CurrentOverlapCountTest; i++)
+                if (!SenseWorlds.ContainsKey(CurrentOverlapLoctionColliders[i].GetInstanceID()))
                 {
-                    if (!SenseWorlds.ContainsKey(CurrentOverlapLoctionColliders[i].GetInstanceID()))
-                    {
-                        GameObject SenseWorldGameObject = new GameObject("SenseWorld");
-                        AmandsSenseWorld amandsSenseWorld = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
-                        amandsSenseWorld.OwnerCollider = CurrentOverlapLoctionColliders[i];
-                        amandsSenseWorld.OwnerGameObject = amandsSenseWorld.OwnerCollider.gameObject;
-                        amandsSenseWorld.Id = amandsSenseWorld.OwnerCollider.GetInstanceID();
-                        amandsSenseWorld.Delay = Math.Min(0, Vector3.Distance(Player.Position, amandsSenseWorld.OwnerCollider.transform.position) / AmandsSensePlugin.Speed.Value);
-                        SenseWorlds.Add(amandsSenseWorld.Id, amandsSenseWorld);
-                    }
-                    else
-                        SenseWorlds[CurrentOverlapLoctionColliders[i].GetInstanceID()].RestartSense();
-                }
-
-                CurrentOverlapLocation++;
-            }
-            else if (AmandsSensePlugin.SenseAlwaysOn.Value)
-            {
-                AlwaysOnTime += Time.deltaTime;
-                if (AlwaysOnTime > AmandsSensePlugin.AlwaysOnFrequency.Value)
-                {
-                    AlwaysOnTime = 0f;
-                    CurrentOverlapLocation = 0;
-                    SenseDeadBodies();
-                }
-            }
-
-            if (CooldownTime < AmandsSensePlugin.Cooldown.Value)
-                CooldownTime += Time.deltaTime;
-
-            if (Input.GetKeyDown(AmandsSensePlugin.SenseKey.Value.MainKey))
-            {
-                if (AmandsSensePlugin.DoubleClick.Value)
-                {
-                    float timeSinceLastClick = Time.time - lastDoubleClickTime;
-                    lastDoubleClickTime = Time.time;
-                    if (timeSinceLastClick <= 0.5f && CooldownTime >= AmandsSensePlugin.Cooldown.Value)
-                    {
-                        CooldownTime = 0f;
-                        CurrentOverlapLocation = 0;
-                        SenseDeadBodies();
-                        ShowSenseExfils();
-                        if (prismEffects != null)
-                        {
-                            Radius = 0;
-                            prismEffects.useDof = AmandsSensePlugin.useDof.Value;
-                        }
-                        if (LoadedAudioClips.ContainsKey("Sense.wav"))
-                            SenseAudioSource.PlayOneShot(LoadedAudioClips["Sense.wav"], AmandsSensePlugin.ActivateSenseVolume.Value);
-                    }
+                    GameObject SenseWorldGameObject = new("SenseWorld");
+                    AmandsSenseWorld amandsSenseWorld = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
+                    amandsSenseWorld.OwnerCollider = CurrentOverlapLoctionColliders[i];
+                    amandsSenseWorld.OwnerGameObject = amandsSenseWorld.OwnerCollider.gameObject;
+                    amandsSenseWorld.Id = amandsSenseWorld.OwnerCollider.GetInstanceID();
+                    amandsSenseWorld.Delay = Math.Min(0, Vector3.Distance(Player.Position, amandsSenseWorld.OwnerCollider.transform.position) / Plugin.Speed.Value);
+                    SenseWorlds.Add(amandsSenseWorld.Id, amandsSenseWorld);
                 }
                 else
+                    SenseWorlds[CurrentOverlapLoctionColliders[i].GetInstanceID()].RestartSense();
+            }
+
+            CurrentOverlapLocation++;
+        }
+        else if (Plugin.SenseAlwaysOn.Value)
+        {
+            AlwaysOnTime += Time.deltaTime;
+            if (AlwaysOnTime > Plugin.AlwaysOnFrequency.Value)
+            {
+                AlwaysOnTime = 0f;
+                CurrentOverlapLocation = 0;
+                SenseDeadBodies();
+            }
+        }
+
+        if (CooldownTime < Plugin.Cooldown.Value)
+            CooldownTime += Time.deltaTime;
+
+        if (Input.GetKeyDown(Plugin.SenseKey.Value.MainKey))
+        {
+            if (Plugin.DoubleClick.Value)
+            {
+                float timeSinceLastClick = Time.time - lastDoubleClickTime;
+                lastDoubleClickTime = Time.time;
+
+                if (timeSinceLastClick <= 0.5f && CooldownTime >= Plugin.Cooldown.Value)
                 {
-                    if (CooldownTime >= AmandsSensePlugin.Cooldown.Value)
+                    CooldownTime = 0f;
+                    CurrentOverlapLocation = 0;
+                    SenseDeadBodies();
+                    ShowSenseExfils();
+
+                    if (prismEffects != null)
                     {
-                        CooldownTime = 0f;
-                        CurrentOverlapLocation = 0;
-                        SenseDeadBodies();
-                        ShowSenseExfils();
-                        if (prismEffects != null)
-                        {
-                            Radius = 0;
-                            prismEffects.useDof = AmandsSensePlugin.useDof.Value;
-                        }
-                        if (LoadedAudioClips.ContainsKey("Sense.wav"))
-                            SenseAudioSource.PlayOneShot(LoadedAudioClips["Sense.wav"], AmandsSensePlugin.ActivateSenseVolume.Value);
+                        Radius = 0;
+                        prismEffects.useDof = Plugin.useDof.Value;
                     }
                 }
             }
-
-            if (Radius < Mathf.Max(AmandsSensePlugin.Radius.Value, AmandsSensePlugin.DeadPlayerRadius.Value))
+            else
             {
-                Radius += AmandsSensePlugin.Speed.Value * Time.deltaTime;
-                if (prismEffects != null)
+                if (CooldownTime >= Plugin.Cooldown.Value)
                 {
-                    prismEffects.dofFocusPoint = Radius - prismEffects.dofFocusDistance;
-                    if (prismEffects.dofRadius < 0.5f)
-                        prismEffects.dofRadius += 2f * Time.deltaTime;
+                    CooldownTime = 0f;
+                    CurrentOverlapLocation = 0;
+                    SenseDeadBodies();
+                    ShowSenseExfils();
+
+                    if (prismEffects != null)
+                    {
+                        Radius = 0;
+                        prismEffects.useDof = Plugin.useDof.Value;
+                    }
                 }
             }
-            else if (prismEffects != null && prismEffects.dofRadius > 0.001f)
+        }
+
+        if (Radius < Mathf.Max(Plugin.Radius.Value, Plugin.DeadPlayerRadius.Value))
+        {
+            Radius += Plugin.Speed.Value * Time.deltaTime;
+            if (prismEffects != null)
             {
-                prismEffects.dofRadius -= 0.5f * Time.deltaTime;
-                if (prismEffects.dofRadius < 0.001f)
-                    prismEffects.useDof = false;
+                prismEffects.dofFocusPoint = Radius - prismEffects.dofFocusDistance;
+                if (prismEffects.dofRadius < 0.5f)
+                    prismEffects.dofRadius += 2f * Time.deltaTime;
             }
+        }
+        else if (prismEffects != null && prismEffects.dofRadius > 0.001f)
+        {
+            prismEffects.dofRadius -= 0.5f * Time.deltaTime;
+            if (prismEffects.dofRadius < 0.001f)
+                prismEffects.useDof = false;
         }
     }
 
     public void SenseDeadBodies()
     {
-        foreach (SenseDeadPlayerStruct deadPlayer in DeadPlayers)
+        Console.WriteLine("sense: SenseDeadBodies");
+
+        foreach (var dp in DeadPlayers)
         {
-            if (Vector3.Distance(Player.Position, deadPlayer.victim.Position) < AmandsSensePlugin.DeadPlayerRadius.Value)
+            if (Vector3.Distance(Player.Position, dp.victim.Position) >= Plugin.DeadPlayerRadius.Value)
+                continue;
+
+            if (!SenseWorlds.TryGetValue(dp.victim.GetInstanceID(), out var sw))
             {
-                if (!SenseWorlds.ContainsKey(deadPlayer.victim.GetInstanceID()))
-                {
-                    GameObject SenseWorldGameObject = new GameObject("SenseWorld");
-                    AmandsSenseWorld amandsSenseWorld = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
-                    amandsSenseWorld.OwnerGameObject = deadPlayer.victim.gameObject;
-                    amandsSenseWorld.Id = deadPlayer.victim.GetInstanceID();
-                    amandsSenseWorld.Delay = Math.Min(0, Vector3.Distance(Player.Position, deadPlayer.victim.Position) / AmandsSensePlugin.Speed.Value);
-                    amandsSenseWorld.Lazy = false;
-                    amandsSenseWorld.eSenseWorldType = ESenseWorldType.Deadbody;
-                    amandsSenseWorld.SenseDeadPlayer = deadPlayer.victim as LocalPlayer;
-                    SenseWorlds.Add(amandsSenseWorld.Id, amandsSenseWorld);
-                }
-                else
-                    SenseWorlds[deadPlayer.victim.GetInstanceID()].RestartSense();
+                var SenseWorldGameObject = new GameObject("SenseWorld");
+                sw = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
+                sw.OwnerGameObject = dp.victim.gameObject;
+                sw.Id = dp.victim.GetInstanceID();
+                sw.Delay = Math.Min(0, Vector3.Distance(Player.Position, dp.victim.Position) / Plugin.Speed.Value);
+                sw.Lazy = false;
+                sw.eSenseWorldType = ESenseWorldType.Deadbody;
+                sw.SenseDeadPlayer = dp.victim as LocalPlayer;
+                SenseWorlds.Add(sw.Id, sw);
             }
+
+            sw.RestartSense();
         }
     }
 
     public void ShowSenseExfils()
     {
-        if (!AmandsSensePlugin.EnableExfilSense.Value)
+        Console.WriteLine("sense: ShowSenseExfils");
+
+        if (!Plugin.EnableExfilSense.Value)
             return;
 
+#warning Fix this
         if (scene == "Factory_Day" || scene == "Factory_Night" || scene == "Laboratory_Scripts")
             return;
 
@@ -244,17 +237,16 @@ public class AmandsSenseClass : MonoBehaviour
                 senseExfil.ShowSense();
         }
 
-        if (AmandsSensePlugin.ExfilLightShadows.Value && ClosestAmandsSenseExfil != null && ClosestAmandsSenseExfil.light != null)
+        if (Plugin.ExfilLightShadows.Value && ClosestAmandsSenseExfil != null && ClosestAmandsSenseExfil.light != null)
             ClosestAmandsSenseExfil.light.shadows = LightShadows.Hard;
     }
 
     public static void Clear()
     {
-        foreach (KeyValuePair<int, AmandsSenseWorld> keyValuePair in SenseWorlds)
-        {
-            if (keyValuePair.Value != null)
-                keyValuePair.Value.RemoveSense();
-        }
+        Console.WriteLine("sense: Clear");
+
+        foreach (var kv in SenseWorlds)
+            kv.Value?.RemoveSense();
 
         SenseWorlds.Clear();
 
@@ -266,6 +258,8 @@ public class AmandsSenseClass : MonoBehaviour
 
     public static ESenseItemType SenseItemType(Type itemType)
     {
+        Console.WriteLine("sense: SenseItemType");
+
         if (TemplateIdToObjectMappingsClass.TypeTable["57864ada245977548638de91"].IsAssignableFrom(itemType))
             return ESenseItemType.BuildingMaterials;
         if (TemplateIdToObjectMappingsClass.TypeTable["57864a66245977548f04a81f"].IsAssignableFrom(itemType))
@@ -383,24 +377,18 @@ public class AmandsSenseClass : MonoBehaviour
         }
         finally
         {
-            if (reader != null)
-                reader.Close();
+            reader?.Close();
         }
     }
 
-    public static void ReloadFiles(bool onlySounds)
+    public static void ReloadFiles()
     {
-        if (onlySounds)
-            goto OnlySounds;
+        var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx", "plugins", "Sense");
+        var imageDir = Path.Combine(baseDir, "images");
 
-        string[] Files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sense/images/", "*.png");
-        foreach (string File in Files)
+        var imageFiles = Directory.GetFiles(imageDir.CreateDirectory(), "*.png");
+        foreach (string File in imageFiles)
             LoadSprite(File);
-
-OnlySounds:
-        string[] AudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/BepInEx/plugins/Sense/sounds/");
-        foreach (string File in AudioFiles)
-            LoadAudioClip(File);
     }
 
     async static void LoadSprite(string path)
@@ -417,46 +405,14 @@ OnlySounds:
             await Task.Yield();
 
         if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+        {
             return null;
+        }
         else
         {
             Texture2D texture = ((DownloadHandlerTexture) www.downloadHandler).texture;
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-
             return sprite;
-        }
-    }
-
-    async static void LoadAudioClip(string path)
-    {
-        LoadedAudioClips[Path.GetFileName(path)] = await RequestAudioClip(path);
-    }
-
-    async static Task<AudioClip> RequestAudioClip(string path)
-    {
-        string extension = Path.GetExtension(path);
-        AudioType audioType = AudioType.WAV;
-        switch (extension)
-        {
-            case ".wav":
-                audioType = AudioType.WAV;
-                break;
-            case ".ogg":
-                audioType = AudioType.OGGVORBIS;
-                break;
-        }
-        UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, audioType);
-        var SendWeb = www.SendWebRequest();
-
-        while (!SendWeb.isDone)
-            await Task.Yield();
-
-        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-            return null;
-        else
-        {
-            AudioClip audioclip = DownloadHandlerAudioClip.GetContent(www);
-            return audioclip;
         }
     }
 }

@@ -2,14 +2,8 @@
 
 namespace AmandsSense.Sense;
 
-public struct SenseDeadPlayerStruct
+public struct SenseDeadPlayerStruct(Player Victim, Player Aggressor)
 {
-    public Player victim;
-    public Player aggressor;
-
-    public SenseDeadPlayerStruct(Player Victim, Player Aggressor)
-    {
-        victim = Victim;
-        aggressor = Aggressor;
-    }
+    public Player victim = Victim;
+    public Player aggressor = Aggressor;
 }

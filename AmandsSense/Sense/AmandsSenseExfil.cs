@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
 using EFT;
 using EFT.Interactive;
-using System.Linq;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace AmandsSense.Sense;
 
@@ -12,7 +13,7 @@ public class AmandsSenseExfil : MonoBehaviour
     public ExfiltrationPoint exfiltrationPoint;
 
     public Color color = Color.green;
-    public Color textColor = AmandsSensePlugin.TextColor.Value;
+    public Color textColor = Plugin.TextColor.Value;
 
     public SpriteRenderer spriteRenderer;
     public Sprite sprite;
@@ -35,13 +36,16 @@ public class AmandsSenseExfil : MonoBehaviour
 
     public void SetSense(ExfiltrationPoint ExfiltrationPoint)
     {
+        Console.WriteLine("sense: AmandsSenseExfil");
+
         exfiltrationPoint = ExfiltrationPoint;
-        gameObject.transform.position = exfiltrationPoint.transform.position + Vector3.up * AmandsSensePlugin.ExfilVerticalOffset.Value;
+        gameObject.transform.position = exfiltrationPoint.transform.position + Vector3.up * Plugin.ExfilVerticalOffset.Value;
         gameObject.transform.localScale = new Vector3(-50, 50, 50);
     }
 
     public void Construct()
     {
+        Console.WriteLine("sense: 2600");
         // AmandsSenseExfil Sprite GameObject
         GameObject spriteGameObject = new GameObject("Sprite");
         spriteGameObject.transform.SetParent(gameObject.transform, false);
@@ -58,7 +62,7 @@ public class AmandsSenseExfil : MonoBehaviour
         light.color = new Color(color.r, color.g, color.b, 1f);
         light.shadows = LightShadows.None;
         light.intensity = 0f;
-        light.range = AmandsSensePlugin.ExfilLightRange.Value;
+        light.range = Plugin.ExfilLightRange.Value;
 
         // AmandsSenseExfil Text
         textGameObject = new GameObject("Text");
@@ -114,17 +118,18 @@ public class AmandsSenseExfil : MonoBehaviour
 
         enabled = false;
         gameObject.SetActive(false);
+        Console.WriteLine("sense: 2601");
     }
     public void ShowSense()
     {
         color = Color.green;
-        textColor = AmandsSensePlugin.TextColor.Value;
+        textColor = Plugin.TextColor.Value;
 
         if (exfiltrationPoint != null && exfiltrationPoint.gameObject.activeSelf && AmandsSenseClass.Player != null && exfiltrationPoint.InfiltrationMatch(AmandsSenseClass.Player))
         {
             sprite = AmandsSenseClass.LoadedSprites["Exfil.png"];
             bool Unmet = exfiltrationPoint.UnmetRequirements(AmandsSenseClass.Player).ToArray().Any();
-            color = Unmet ? AmandsSensePlugin.ExfilUnmetColor.Value : AmandsSensePlugin.ExfilColor.Value;
+            color = Unmet ? Plugin.ExfilUnmetColor.Value : Plugin.ExfilColor.Value;
             // AmandsSenseExfil Sprite
             if (spriteRenderer != null)
             {
@@ -137,7 +142,7 @@ public class AmandsSenseExfil : MonoBehaviour
             {
                 light.color = new Color(color.r, color.g, color.b, 1f);
                 light.intensity = 0f;
-                light.range = AmandsSensePlugin.ExfilLightRange.Value;
+                light.range = Plugin.ExfilLightRange.Value;
             }
 
             // AmandsSenseExfil Type
@@ -186,6 +191,7 @@ public class AmandsSenseExfil : MonoBehaviour
             Intensity = 0f;
             UpdateIntensity = true;
         }
+        
         if (exfiltrationPoint == null)
         {
             AmandsSenseClass.SenseExfils.Remove(this);
@@ -198,7 +204,7 @@ public class AmandsSenseExfil : MonoBehaviour
         {
             sprite = AmandsSenseClass.LoadedSprites["Exfil.png"];
             bool Unmet = exfiltrationPoint.UnmetRequirements(AmandsSenseClass.Player).ToArray().Any();
-            color = Unmet ? AmandsSensePlugin.ExfilUnmetColor.Value : AmandsSensePlugin.ExfilColor.Value;
+            color = Unmet ? Plugin.ExfilUnmetColor.Value : Plugin.ExfilColor.Value;
             // AmandsSenseExfil Sprite
             if (spriteRenderer != null)
             {
@@ -210,7 +216,7 @@ public class AmandsSenseExfil : MonoBehaviour
             if (light != null)
             {
                 light.color = new Color(color.r, color.g, color.b, 1f);
-                light.range = AmandsSensePlugin.ExfilLightRange.Value;
+                light.range = Plugin.ExfilLightRange.Value;
             }
 
             // AmandsSenseExfil Type
@@ -263,7 +269,7 @@ public class AmandsSenseExfil : MonoBehaviour
         {
             if (Starting)
             {
-                Intensity += AmandsSensePlugin.IntensitySpeed.Value * Time.deltaTime;
+                Intensity += Plugin.IntensitySpeed.Value * Time.deltaTime;
                 if (Intensity >= 1f)
                 {
                     UpdateIntensity = false;
@@ -272,7 +278,7 @@ public class AmandsSenseExfil : MonoBehaviour
             }
             else
             {
-                Intensity -= AmandsSensePlugin.IntensitySpeed.Value * Time.deltaTime;
+                Intensity -= Plugin.IntensitySpeed.Value * Time.deltaTime;
                 if (Intensity <= 0f)
                 {
                     Starting = true;
@@ -286,7 +292,7 @@ public class AmandsSenseExfil : MonoBehaviour
             if (spriteRenderer != null)
                 spriteRenderer.color = new Color(color.r, color.g, color.b, color.a * Intensity);
             if (light != null)
-                light.intensity = Intensity * AmandsSensePlugin.ExfilLightIntensity.Value;
+                light.intensity = Intensity * Plugin.ExfilLightIntensity.Value;
             if (typeText != null)
                 typeText.color = new Color(color.r, color.g, color.b, Intensity);
             if (nameText != null)
@@ -299,7 +305,7 @@ public class AmandsSenseExfil : MonoBehaviour
         else if (!Starting)
         {
             LifeSpan += Time.deltaTime;
-            if (LifeSpan > AmandsSensePlugin.ExfilDuration.Value)
+            if (LifeSpan > Plugin.ExfilDuration.Value)
                 UpdateIntensity = true;
         }
         if (Camera.main != null)

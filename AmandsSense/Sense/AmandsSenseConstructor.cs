@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using EFT;
+﻿using EFT;
 using EFT.Interactive;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace AmandsSense.Sense;
 
@@ -10,27 +10,34 @@ public class AmandsSenseConstructor : MonoBehaviour
 {
     public AmandsSenseWorld amandsSenseWorld;
 
-    public Color color = AmandsSensePlugin.ObservedLootItemColor.Value;
-    public Color textColor = AmandsSensePlugin.TextColor.Value;
-
-    public SpriteRenderer spriteRenderer;
-    public Sprite sprite;
-
-    public Light light;
+    public Color color = Plugin.ObservedLootItemColor.Value;
+    public Color textColor = Plugin.TextColor.Value;
 
     public GameObject textGameObject;
+    public SpriteRenderer spriteRenderer;
+    public Sprite sprite;
+    public Light light;
 
     public TextMeshPro typeText;
     public TextMeshPro nameText;
     public TextMeshPro descriptionText;
 
-    virtual public void Construct()
+    public virtual void SetSense(ObservedLootItem observedLootItem) { }
+    public virtual void SetSense(LootableContainer lootableContainer) { }
+    public virtual void SetSense(LocalPlayer DeadPlayer) { }
+    public virtual void SetSense(ExfiltrationPoint ExfiltrationPoint) { }
+    public virtual void UpdateSense() { }
+    public virtual void UpdateSenseLocation() { }
+    public virtual void UpdateIntensity(float Intensity) { }
+    public virtual void RemoveSense() { }
+
+    public virtual void Construct()
     {
         // SenseConstructor Sprite GameObject
         GameObject spriteGameObject = new GameObject("Sprite");
         spriteGameObject.transform.SetParent(gameObject.transform, false);
         RectTransform spriteRectTransform = spriteGameObject.AddComponent<RectTransform>();
-        spriteRectTransform.localScale = Vector3.one * AmandsSensePlugin.IconSize.Value;
+        spriteRectTransform.localScale = Vector3.one * Plugin.IconSize.Value;
 
         // SenseConstructor Sprite
         spriteRenderer = spriteGameObject.AddComponent<SpriteRenderer>();
@@ -40,18 +47,18 @@ public class AmandsSenseConstructor : MonoBehaviour
         // SenseConstructor Sprite Light
         light = spriteGameObject.AddComponent<Light>();
         light.color = new Color(color.r, color.g, color.b, 1f);
-        light.shadows = AmandsSensePlugin.LightShadows.Value ? LightShadows.Hard : LightShadows.None;
+        light.shadows = Plugin.LightShadows.Value ? LightShadows.Hard : LightShadows.None;
         light.intensity = 0f;
-        light.range = AmandsSensePlugin.LightRange.Value;
+        light.range = Plugin.LightRange.Value;
 
-        if (AmandsSensePlugin.EnableSense.Value != EEnableSense.OnText)
+        if (Plugin.EnableSense.Value != EEnableSense.OnText)
             return;
 
         // SenseConstructor Text
         textGameObject = new GameObject("Text");
         textGameObject.transform.SetParent(gameObject.transform, false);
         RectTransform textRectTransform = textGameObject.AddComponent<RectTransform>();
-        textRectTransform.localPosition = new Vector3(AmandsSensePlugin.TextOffset.Value, 0, 0);
+        textRectTransform.localPosition = new Vector3(Plugin.TextOffset.Value, 0, 0);
         textRectTransform.pivot = new Vector2(0, 0.5f);
 
         // SenseConstructor VerticalLayoutGroup
@@ -91,37 +98,5 @@ public class AmandsSenseConstructor : MonoBehaviour
         descriptionText.fontSize = 0.75f;
         descriptionText.text = "";
         descriptionText.color = new Color(textColor.r, textColor.g, textColor.b, 0f);
-    }
-    virtual public void SetSense(ObservedLootItem observedLootItem)
-    {
-
-    }
-    virtual public void SetSense(LootableContainer lootableContainer)
-    {
-
-    }
-    virtual public void SetSense(LocalPlayer DeadPlayer)
-    {
-
-    }
-    virtual public void SetSense(ExfiltrationPoint ExfiltrationPoint)
-    {
-
-    }
-    virtual public void UpdateSense()
-    {
-
-    }
-    virtual public void UpdateSenseLocation()
-    {
-
-    }
-    virtual public void UpdateIntensity(float Intensity)
-    {
-
-    }
-    virtual public void RemoveSense()
-    {
-
     }
 }

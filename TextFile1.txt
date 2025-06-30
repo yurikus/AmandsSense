@@ -1,0 +1,31 @@
+yEngine.Animator.SetBool (System.Int32 id, System.Boolean value) (at <f4083f9c602e427caf59407f68b9997e>:0)
+GClass1440.SetBool (System.Int32 valueNameHash, System.Boolean value) (at <cce101b0b308435c821943e698272c3e>:0)
+WeaponAnimationSpeedControllerClass.SetBoltCatch (IAnimator animator, System.Boolean boltCatch) (at <cce101b0b308435c821943e698272c3e>:0)
+FirearmsAnimator.SetBoltCatch (System.Boolean active) (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player+FirearmController.Destroy () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player.method_118 () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player.Dispose () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.LocalPlayer.Dispose () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player.OnDestroy () (at <cce101b0b308435c821943e698272c3e>:0)
+UnityEngine.DebugLogHandler:LogException(Exception, Object)
+Class413:LogException(Exception, Object)
+UnityEngine.Debug:CallOverridenDebugHandler(Exception, Object)
+
+[Error  : Unity Log] NullReferenceException
+Stack trace:
+UnityEngine.Animator.SetBool (System.Int32 id, System.Boolean value) (at <f4083f9c602e427caf59407f68b9997e>:0)
+GClass1440.SetBool (System.Int32 valueNameHash, System.Boolean value) (at <cce101b0b308435c821943e698272c3e>:0)
+WeaponAnimationSpeedControllerClass.SetBoltCatch (IAnimator animator, System.Boolean boltCatch) (at <cce101b0b308435c821943e698272c3e>:0)
+FirearmsAnimator.SetBoltCatch (System.Boolean active) (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player+FirearmController.Destroy () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player.method_118 () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player.Dispose () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.LocalPlayer.Dispose () (at <cce101b0b308435c821943e698272c3e>:0)
+EFT.Player.OnDestroy () (at <cce101b0b308435c821943e698272c3e>:0)
+UnityEngine.DebugLogHandler:LogException(Exception, Object)
+Class413:LogException(Exception, Object)
+UnityEngine.Debug:CallOverridenDebugHandler(Exception, Object)
+
+[Error  : Unity Log] NullReferenceException
+Stack trace:
+UnityEngine.Animator.SetBool (System.Int32 id, System.Boolean value) (at <f4083f9c602e427caf59407f68b9997e>:0)

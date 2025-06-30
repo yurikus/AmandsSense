@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using EFT;
+﻿using System;
 using System.Threading.Tasks;
+using EFT;
 using EFT.Interactive;
-using System;
+using UnityEngine;
 
 namespace AmandsSense.Sense;
 
@@ -69,7 +69,7 @@ public class AmandsSenseWorld : MonoBehaviour
 
             amandsSenseConstructorGameObject = new GameObject("Constructor");
             amandsSenseConstructorGameObject.transform.SetParent(gameObject.transform, false);
-            amandsSenseConstructorGameObject.transform.localScale = Vector3.one * AmandsSensePlugin.Size.Value;
+            amandsSenseConstructorGameObject.transform.localScale = Vector3.one * Plugin.Size.Value;
 
             if (Lazy)
             {
@@ -110,6 +110,7 @@ public class AmandsSenseWorld : MonoBehaviour
             }
             else
             {
+                Console.WriteLine("sense: 9001");
                 switch (eSenseWorldType)
                 {
                     case ESenseWorldType.Item:
@@ -125,6 +126,7 @@ public class AmandsSenseWorld : MonoBehaviour
                         amandsSenseConstructor.SetSense(SenseDeadPlayer);
                         break;
                 }
+                Console.WriteLine("sense: 9002");
             }
 
             // SenseWorld Starting Posittion
@@ -132,7 +134,7 @@ public class AmandsSenseWorld : MonoBehaviour
             {
                 case ESenseWorldType.Item:
                 case ESenseWorldType.Container:
-                    gameObject.transform.position = new Vector3(OwnerCollider.bounds.center.x, OwnerCollider.ClosestPoint(OwnerCollider.bounds.center + Vector3.up * 10f).y + AmandsSensePlugin.VerticalOffset.Value, OwnerCollider.bounds.center.z);
+                    gameObject.transform.position = new Vector3(OwnerCollider.bounds.center.x, OwnerCollider.ClosestPoint(OwnerCollider.bounds.center + Vector3.up * 10f).y + Plugin.VerticalOffset.Value, OwnerCollider.bounds.center.z);
                     break;
 
                 case ESenseWorldType.Drawer:
@@ -166,12 +168,12 @@ public class AmandsSenseWorld : MonoBehaviour
 
             if (amandsSenseConstructor != null)
                 amandsSenseConstructor.UpdateSense();
-            
+
             // SenseWorld Position
             switch (eSenseWorldType)
             {
                 case ESenseWorldType.Item:
-                    gameObject.transform.position = new Vector3(OwnerCollider.bounds.center.x, OwnerCollider.ClosestPoint(OwnerCollider.bounds.center + Vector3.up * 10f).y + AmandsSensePlugin.VerticalOffset.Value, OwnerCollider.bounds.center.z);
+                    gameObject.transform.position = new Vector3(OwnerCollider.bounds.center.x, OwnerCollider.ClosestPoint(OwnerCollider.bounds.center + Vector3.up * 10f).y + Plugin.VerticalOffset.Value, OwnerCollider.bounds.center.z);
                     break;
                 case ESenseWorldType.Container:
                     break;
@@ -193,7 +195,7 @@ public class AmandsSenseWorld : MonoBehaviour
             return;
 
         LifeSpan = 0f;
-        Delay = Math.Min(0, Vector3.Distance(AmandsSenseClass.Player.Position, gameObject.transform.position) / AmandsSensePlugin.Speed.Value);
+        Delay = Math.Min(0, Vector3.Distance(AmandsSenseClass.Player.Position, gameObject.transform.position) / Plugin.Speed.Value);
         WaitAndStart();
     }
 
@@ -205,10 +207,11 @@ public class AmandsSenseWorld : MonoBehaviour
             case ESenseWorldType.Container:
             case ESenseWorldType.Drawer:
             case ESenseWorldType.Deadbody:
-                return AmandsSenseClass.Player != null && (transform.position.y < AmandsSenseClass.Player.Position.y + AmandsSensePlugin.MinHeight.Value || transform.position.y > AmandsSenseClass.Player.Position.y + AmandsSensePlugin.MaxHeight.Value);
+                return AmandsSenseClass.Player != null && (transform.position.y < AmandsSenseClass.Player.Position.y + Plugin.MinHeight.Value || transform.position.y > AmandsSenseClass.Player.Position.y + Plugin.MaxHeight.Value);
         }
         return false;
     }
+
     public void RemoveSense()
     {
         if (amandsSenseConstructor != null)
@@ -218,18 +221,21 @@ public class AmandsSenseWorld : MonoBehaviour
         if (gameObject != null)
             Destroy(gameObject);
     }
+
     public void CancelSense()
     {
+        Console.WriteLine("sense: 9012");
         UpdateIntensity = true;
         Starting = false;
     }
+
     public void Update()
     {
         if (UpdateIntensity)
         {
             if (Starting)
             {
-                Intensity += AmandsSensePlugin.IntensitySpeed.Value * Time.deltaTime;
+                Intensity += Plugin.IntensitySpeed.Value * Time.deltaTime;
                 if (Intensity >= 1f)
                 {
                     UpdateIntensity = false;
@@ -238,7 +244,7 @@ public class AmandsSenseWorld : MonoBehaviour
             }
             else
             {
-                Intensity -= AmandsSensePlugin.IntensitySpeed.Value * Time.deltaTime;
+                Intensity -= Plugin.IntensitySpeed.Value * Time.deltaTime;
                 if (Intensity <= 0f)
                 {
                     if (Waiting)
@@ -249,13 +255,13 @@ public class AmandsSenseWorld : MonoBehaviour
                 }
             }
 
-        if (amandsSenseConstructor != null)
-            amandsSenseConstructor.UpdateIntensity(Intensity);
+            if (amandsSenseConstructor != null)
+                amandsSenseConstructor.UpdateIntensity(Intensity);
         }
         else if (!Starting && !Waiting)
         {
             LifeSpan += Time.deltaTime;
-            if (LifeSpan > AmandsSensePlugin.Duration.Value)
+            if (LifeSpan > Plugin.Duration.Value)
                 UpdateIntensity = true;
         }
 
@@ -267,7 +273,7 @@ public class AmandsSenseWorld : MonoBehaviour
                 case ESenseWorldType.Container:
                 case ESenseWorldType.Deadbody:
                     transform.rotation = Camera.main.transform.rotation;
-                    transform.localScale = Vector3.one * Mathf.Min(AmandsSensePlugin.SizeClamp.Value, Vector3.Distance(Camera.main.transform.position, transform.position));
+                    transform.localScale = Vector3.one * Mathf.Min(Plugin.SizeClamp.Value, Vector3.Distance(Camera.main.transform.position, transform.position));
                     break;
                 case ESenseWorldType.Drawer:
                     break;

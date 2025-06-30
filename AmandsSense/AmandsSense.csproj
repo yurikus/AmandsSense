@@ -23,10 +23,27 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
+  <Target Name="CopyServerOutputToSPT" AfterTargets="Build">
+    <PropertyGroup>
+      <ClientModPath>../../../BepInEx/plugins/</ClientModPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Artifacts Include="$(OutDir)$(TargetName).dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(Artifacts)"
+          DestinationFolder="$(ClientModPath)"
+          OverwriteReadOnlyFiles="true" />
+
+    <Message Text="$(TargetName) -> $(ClientModPath)" Importance="high" />
+  </Target>
+
   <PropertyGroup>
     <AssemblySearchPaths>
       ..\..\..\BepInEx\core;
       ..\..\..\BepInEx\plugins\spt;
+      ..\..\..\BepInEx\plugins\spt\ConfigurationManager;
       ..\..\..\EscapeFromTarkov_Data\Managed;
       $(ReferencePath);
     </AssemblySearchPaths>
@@ -49,9 +66,9 @@
     <Reference Include="spt-core" />
     <Reference Include="spt-common" />
     <Reference Include="spt-reflection" />
+    <Reference Include="spt-debugging" />
     <!--
     <Reference Include="spt-custom" />
-    <Reference Include="spt-debugging" />
     <Reference Include="spt-singleplayer" />
     -->
   </ItemGroup>
@@ -66,7 +83,6 @@
     <Reference Include="Sirenix.Utilities" />
     <Reference Include="Unity.TextMeshPro" />
     <Reference Include="UnityEngine.PhysicsModule" />
-    <Reference Include="UnityEngine.AudioModule" />
     <Reference Include="UnityEngine.UI" />
     <Reference Include="UnityEngine.UIElementsModule" />
     <Reference Include="UnityEngine.InputLegacyModule" />
@@ -77,6 +93,7 @@
     <Reference Include="UnityEngine.UnityWebRequestAudioModule" />
     <Reference Include="Unity.Postprocessing.Runtime" />
     <!--
+    <Reference Include="UnityEngine.AudioModule" />
     <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule" />
     <Reference Include="UnityEngine.UnityWebRequestWWWModule" />
     <Reference Include="AmplifyMotion" />

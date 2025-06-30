@@ -1,18 +1,21 @@
+using System;
 using AmandsSense.Patches;
 using AmandsSense.Sense;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using UnityEngine;
 
 namespace AmandsSense;
 
 [BepInPlugin("com.Amanda.Sense", "Amand's Sense", SenseVersion)]
-public class AmandsSensePlugin : BaseUnityPlugin
+public class Plugin : BaseUnityPlugin
 {
-    public const string SenseVersion = "2.0.2";
+    public const string SenseVersion = "3.0.0";
 
-    public static GameObject Hook;
-    public static AmandsSenseClass AmandsSenseClassComponent;
+    public static ManualLogSource Log;
+    //public static GameObject Hook;
+    //public static AmandsSenseClass AmandsSenseClassComponent;
 
     public static ConfigEntry<EEnableSense> EnableSense { get; set; }
     public static ConfigEntry<bool> EnableExfilSense { get; set; }
@@ -61,7 +64,6 @@ public class AmandsSensePlugin : BaseUnityPlugin
     public static ConfigEntry<float> AudioVolume { get; set; }
     public static ConfigEntry<float> ContainerAudioVolume { get; set; }
     public static ConfigEntry<float> ActivateSenseVolume { get; set; }
-    public static ConfigEntry<bool> SenseRareSound { get; set; }
 
     public static ConfigEntry<bool> useDof { get; set; }
 
@@ -129,11 +131,11 @@ public class AmandsSensePlugin : BaseUnityPlugin
 
     private void Awake()
     {
-        //Debug.LogError("Sense Awake()");
-        Hook = new GameObject("AmandsSense");
-        AmandsSenseClassComponent = Hook.AddComponent<AmandsSenseClass>();
-        AmandsSenseClass.SenseAudioSource = Hook.AddComponent<AudioSource>();
-        DontDestroyOnLoad(Hook);
+        Log = Logger;
+        //Hook = new GameObject("AmandsSense");
+        //AmandsSenseClassComponent = Hook.AddComponent<AmandsSenseClass>();
+        //AmandsSenseClass.SenseAudioSource = Hook.AddComponent<AudioSource>();
+        //DontDestroyOnLoad(Hook);
     }
 
     private void Start()
@@ -203,11 +205,9 @@ public class AmandsSensePlugin : BaseUnityPlugin
         AudioRolloff = Config.Bind("AmandsSense", "AudioRolloff", 100, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 120, IsAdvanced = true }));
         AudioVolume = Config.Bind("AmandsSense", "AudioVolume", 0.5f, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 112 }));
         ContainerAudioVolume = Config.Bind("AmandsSense", "ContainerAudioVolume", 0.5f, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 110 }));
-        ActivateSenseVolume = Config.Bind("AmandsSense", "ActivateSenseVolume", 0.5f, new ConfigDescription("requires a custom sound .wav file named Sense.wav", null, new ConfigurationManagerAttributes { Order = 108 }));
-        SenseRareSound = Config.Bind("AmandsSense", "SenseRareSound", false, new ConfigDescription("requires a custom sound .wav file named SenseRare.wav", null, new ConfigurationManagerAttributes { Order = 106 }));
 
         useDof = Config.Bind("AmandsSense Effects", "useDof", true, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 100 }));
-
+        
         ExfilColor = Config.Bind("Colors", "ExfilColor", new Color(0.01f, 1.0f, 0.01f, 1.0f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 570 }));
         ExfilUnmetColor = Config.Bind("Colors", "ExfilUnmetColor", new Color(1.0f, 0.01f, 0.01f, 1.0f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 560 }));
 
@@ -276,16 +276,33 @@ public class AmandsSensePlugin : BaseUnityPlugin
         SpecialEquipmentColor = Config.Bind("Colors", "SpecialEquipmentColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 30 }));
         MapsColor = Config.Bind("Colors", "MapsColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 20 }));
         MoneyColor = Config.Bind("Colors", "MoneyColor", new Color(0.84f, 0.88f, 0.95f, 0.8f), new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 10 }));
-
+        
         if (RequestDefaultValues)
             DefaultValues();
 
-        new AmandsPlayerPatch().Enable();
-        new AmandsKillPatch().Enable();
-        new AmandsSenseExfiltrationPatch().Enable();
-        new AmandsSensePrismEffectsPatch().Enable();
+        SetupPatches();
+    }
 
-        AmandsSenseHelper.Init();
+    private static void SetupPatches()
+    {
+        try
+        {
+
+            new GameWorldDisposePostfixPatch().Enable();
+            new GameWorldAwakePrefixPatch().Enable();
+            new GameWorldStartedPostfixPatch().Enable();
+
+
+            //new AmandsPlayerPatch().Enable();
+            //new AmandsKillPatch().Enable();
+            //new AmandsSenseExfiltrationPatch().Enable();
+            //new AmandsSensePrismEffectsPatch().Enable();
+
+            //AmandsSenseHelper.Init();
+        }
+        catch (Exception ex){ 
+            Log.LogError("AS: EXCEPTION: " + ex.Message + "\r\n" + ex.StackTrace);
+        }
     }
 
     private void DefaultValues()

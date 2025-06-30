@@ -9,7 +9,7 @@ public class AmandsKillPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(Player).GetMethod("OnBeenKilledByAggressor", BindingFlags.Instance | BindingFlags.Public);
+        return typeof(Player).GetMethod(nameof(Player.OnBeenKilledByAggressor), BindingFlags.Instance | BindingFlags.Public);
     }
 
     [PatchPostfix]
