@@ -1,0 +1,8 @@
+<Project>
+
+  <!-- SPT install directory -->
+  <PropertyGroup>
+    <SPTBaseDir>/GM/Tarkov/SPT/SPT-4.0.0-37759-20250627-f822ef5</SPTBaseDir>
+  </PropertyGroup>
+
+</Project>

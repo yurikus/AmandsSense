@@ -1,10 +1,5 @@
 <Project>
   
-  <!-- SPT install directory -->
-  <PropertyGroup>
-    <SPTBaseDir>C:\GM\Tarkov\SPT\SPT-4.0.0-37759-20250627-f822ef5</SPTBaseDir>
-  </PropertyGroup>
-
   <PropertyGroup>
     <ClientModPath>$([MSBuild]::NormalizePath($(SPTBaseDir)/BepInEx/plugins/))</ClientModPath>
     <TargetNameDebug>$(MSBuildProjectName)-debug</TargetNameDebug>

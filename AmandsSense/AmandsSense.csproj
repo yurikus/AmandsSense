@@ -3,7 +3,7 @@
   <!-- Change version here -->
   <PropertyGroup>
     <Version>4.0.0</Version>
-    <InformationalVersion>pre01</InformationalVersion>
+    <InformationalVersion>pre02</InformationalVersion>
     <Company>Amanda</Company>
     <AssemblyName>Amand's Sense</AssemblyName>
     <Product>SPT 4.0, EFT 0.16.7.1.37759</Product>
@@ -34,10 +34,10 @@
 
   <PropertyGroup>
     <AssemblySearchPaths>
-      ..\..\..\BepInEx\core;
-      ..\..\..\BepInEx\plugins\spt;
-      ..\..\..\BepInEx\plugins\spt\ConfigurationManager;
-      ..\..\..\EscapeFromTarkov_Data\Managed;
+      $(SPTBaseDir)/BepInEx/core;
+      $(SPTBaseDir)/BepInEx/plugins/spt;
+      $(SPTBaseDir)/BepInEx/plugins/spt/ConfigurationManager;
+      $(SPTBaseDir)/EscapeFromTarkov_Data/Managed;
       $(ReferencePath);
     </AssemblySearchPaths>
   </PropertyGroup>
