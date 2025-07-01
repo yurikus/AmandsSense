@@ -110,7 +110,6 @@ public class AmandsSenseWorld : MonoBehaviour
             }
             else
             {
-                Console.WriteLine("sense: 9001");
                 switch (eSenseWorldType)
                 {
                     case ESenseWorldType.Item:
@@ -126,7 +125,6 @@ public class AmandsSenseWorld : MonoBehaviour
                         amandsSenseConstructor.SetSense(SenseDeadPlayer);
                         break;
                 }
-                Console.WriteLine("sense: 9002");
             }
 
             // SenseWorld Starting Posittion
@@ -224,7 +222,6 @@ public class AmandsSenseWorld : MonoBehaviour
 
     public void CancelSense()
     {
-        Console.WriteLine("sense: 9012");
         UpdateIntensity = true;
         Starting = false;
     }

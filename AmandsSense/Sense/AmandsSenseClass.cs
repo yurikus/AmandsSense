@@ -181,8 +181,6 @@ public class AmandsSenseClass : MonoBehaviour
 
     public void SenseDeadBodies()
     {
-        Console.WriteLine("sense: SenseDeadBodies");
-
         foreach (var dp in DeadPlayers)
         {
             if (Vector3.Distance(Player.Position, dp.victim.Position) >= Plugin.DeadPlayerRadius.Value)
@@ -207,8 +205,6 @@ public class AmandsSenseClass : MonoBehaviour
 
     public void ShowSenseExfils()
     {
-        Console.WriteLine("sense: ShowSenseExfils");
-
         if (!Plugin.EnableExfilSense.Value)
             return;
 
@@ -243,8 +239,6 @@ public class AmandsSenseClass : MonoBehaviour
 
     public static void Clear()
     {
-        Console.WriteLine("sense: Clear");
-
         foreach (var kv in SenseWorlds)
             kv.Value?.RemoveSense();
 
@@ -258,8 +252,6 @@ public class AmandsSenseClass : MonoBehaviour
 
     public static ESenseItemType SenseItemType(Type itemType)
     {
-        Console.WriteLine("sense: SenseItemType");
-
         if (TemplateIdToObjectMappingsClass.TypeTable["57864ada245977548638de91"].IsAssignableFrom(itemType))
             return ESenseItemType.BuildingMaterials;
         if (TemplateIdToObjectMappingsClass.TypeTable["57864a66245977548f04a81f"].IsAssignableFrom(itemType))

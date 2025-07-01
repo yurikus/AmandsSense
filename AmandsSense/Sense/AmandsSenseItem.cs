@@ -18,8 +18,6 @@ public class AmandsSenseItem : AmandsSenseConstructor
 
     public override void SetSense(ObservedLootItem ObservedLootItem)
     {
-        Console.WriteLine("sense: AmandsSenseItem");
-
         eSenseItemType = ESenseItemType.All;
         color = Plugin.ObservedLootItemColor.Value;
 

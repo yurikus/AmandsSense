@@ -19,8 +19,6 @@ public class AmandsSenseContainer : AmandsSenseConstructor
 
     public override void SetSense(LootableContainer LootableContainer)
     {
-        Console.WriteLine("sense: AmandsSenseContainer");
-
         lootableContainer = LootableContainer;
         if (lootableContainer == null || !lootableContainer.gameObject.activeSelf)
         {

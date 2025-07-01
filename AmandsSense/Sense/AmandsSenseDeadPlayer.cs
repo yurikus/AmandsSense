@@ -19,8 +19,6 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
 
     public override void SetSense(LocalPlayer LocalPlayer)
     {
-        Console.WriteLine("sense: AmandsSenseDeadPlayer");
-
         DeadPlayer = LocalPlayer;
         if (DeadPlayer == null || !DeadPlayer.gameObject.activeSelf)
         {
@@ -61,7 +59,7 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
                 {
                     foreach (Item item in AllRealPlayerItems)
                     {
-                        if (item.Parent != null)
+                        if (item.CurrentAddress != null)
                         {
                             if (item.Parent.Container != null && item.Parent.Container.ParentItem != null && TemplateIdToObjectMappingsClass.TypeTable["5448bf274bdc2dfc2f8b456a"].IsAssignableFrom(item.Parent.Container.ParentItem.GetType()))
                                 continue;
@@ -219,7 +217,7 @@ public class AmandsSenseDeadPlayer : AmandsSenseConstructor
                     {
                         foreach (Item item in AllRealPlayerItems)
                         {
-                            if (item.Parent != null)
+                            if (item.CurrentAddress != null)
                             {
                                 if (item.Parent.Container != null &&
                                     item.Parent.Container.ParentItem != null &&

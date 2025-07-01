@@ -36,8 +36,6 @@ public class AmandsSenseExfil : MonoBehaviour
 
     public void SetSense(ExfiltrationPoint ExfiltrationPoint)
     {
-        Console.WriteLine("sense: AmandsSenseExfil");
-
         exfiltrationPoint = ExfiltrationPoint;
         gameObject.transform.position = exfiltrationPoint.transform.position + Vector3.up * Plugin.ExfilVerticalOffset.Value;
         gameObject.transform.localScale = new Vector3(-50, 50, 50);
@@ -45,7 +43,6 @@ public class AmandsSenseExfil : MonoBehaviour
 
     public void Construct()
     {
-        Console.WriteLine("sense: 2600");
         // AmandsSenseExfil Sprite GameObject
         GameObject spriteGameObject = new GameObject("Sprite");
         spriteGameObject.transform.SetParent(gameObject.transform, false);
@@ -118,7 +115,6 @@ public class AmandsSenseExfil : MonoBehaviour
 
         enabled = false;
         gameObject.SetActive(false);
-        Console.WriteLine("sense: 2601");
     }
     public void ShowSense()
     {
