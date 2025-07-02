@@ -45,20 +45,17 @@ public class GameWorldStartedPostfixPatch : ModulePatch
 
         Plugin.Log.LogInfo($"Found local player: {__instance.MainPlayer.ProfileId}");
 
+        AmandsSenseClass.isFactory = __instance.LocationId.Contains("factory");
         AmandsSenseClass.Player = __instance.MainPlayer;
         AmandsSenseClass.inventoryControllerClass = (PlayerInventoryController) AmandsSenseClass.Player.InventoryController;
         AmandsSenseClass.Clear();
         AmandsSenseClass.scene = SceneManager.GetActiveScene().name;
         AmandsSenseClass.ReloadFiles();
 
-        if (__instance.LocationId.Contains("factory"))
-        {
+        __instance.gameObject.AddComponent<AmandsSenseClass>();
+
+        if (AmandsSenseClass.isFactory)
             Plugin.Log.LogInfo("Factory location detected");
-        }
-        else
-        {
-            __instance.gameObject.AddComponent<AmandsSenseClass>();
-        }
 
         //if (MegamodPlugin.LodOverrideEnabled.Value)
         //    QualitySettings.lodBias = MegamodPlugin.LodBias.Value;

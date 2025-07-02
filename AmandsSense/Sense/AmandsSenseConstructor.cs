@@ -26,6 +26,7 @@ public class AmandsSenseConstructor : MonoBehaviour
     public virtual void SetSense(LootableContainer lootableContainer) { }
     public virtual void SetSense(LocalPlayer DeadPlayer) { }
     public virtual void SetSense(ExfiltrationPoint ExfiltrationPoint) { }
+
     public virtual void UpdateSense() { }
     public virtual void UpdateSenseLocation() { }
     public virtual void UpdateIntensity(float Intensity) { }

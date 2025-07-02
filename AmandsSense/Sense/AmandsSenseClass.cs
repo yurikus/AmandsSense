@@ -54,6 +54,7 @@ public class AmandsSenseClass : MonoBehaviour
     public static List<Item> SenseItems = [];
     public static Transform parent;
     public static string scene;
+    public static bool isFactory = false;
 
     public void Awake()
     {
