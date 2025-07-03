@@ -1,12 +1,15 @@
 {
   "profiles": {
-    "AmandsSense": {
-      "commandName": "Project"
-    },
-    "SPT": {
+    "SPT: test1": {
       "commandName": "Executable",
       "executablePath": "C:\\GM\\Tarkov\\SPT\\SPT-4.0.0-37759-20250627-f822ef5\\EscapeFromTarkov.exe",
-      "commandLineArgs": "-force-gfx-jobs native -token=686222d80003a14ddfb0fd50 -config={'BackendUrl':'https://127.0.0.1:6969','MatchingVersion':'live','Version':'live'}\r\n",
+      "commandLineArgs": "-force-gfx-jobs native -token=6864bacb00052784e581905a -config={'BackendUrl':'https://127.0.0.1:6969','MatchingVersion':'live','Version':'live'}\r\n",
+      "workingDirectory": "C:\\GM\\Tarkov\\SPT\\SPT-4.0.0-37759-20250627-f822ef5"
+    },
+    "SPT: dev0": {
+      "commandName": "Executable",
+      "executablePath": "C:\\GM\\Tarkov\\SPT\\SPT-4.0.0-37759-20250627-f822ef5\\EscapeFromTarkov.exe",
+      "commandLineArgs": "-force-gfx-jobs native -token=68621f870004e1f84982ac5b -config={'BackendUrl':'https://127.0.0.1:6969','MatchingVersion':'live','Version':'live'}\r\n",
       "workingDirectory": "C:\\GM\\Tarkov\\SPT\\SPT-4.0.0-37759-20250627-f822ef5"
     }
   }

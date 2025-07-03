@@ -43,7 +43,7 @@ public class AmandsSenseClass : MonoBehaviour
     public static LayerMask BoxInteractiveLayerMask;
     public static LayerMask BoxDeadbodyLayerMask;
     public static int[] CurrentOverlapCount = new int[9];
-    public static Collider[] CurrentOverlapLoctionColliders = new Collider[100];
+    public static Collider[] CurrentOverlapLocationColliders = new Collider[100];
 
     public static Dictionary<int, AmandsSenseWorld> SenseWorlds = [];
     public static List<SenseDeadPlayerStruct> DeadPlayers = [];
@@ -78,7 +78,7 @@ public class AmandsSenseClass : MonoBehaviour
 
     public void Update()
     {
-        if (gameObject == null || Player == null || Plugin.EnableSense.Value == EEnableSense.Off)
+        if (Plugin.EnableSense.Value == EEnableSense.Off || gameObject == null || Player == null)
             return;
 
         if (CurrentOverlapLocation <= 8)
@@ -86,25 +86,25 @@ public class AmandsSenseClass : MonoBehaviour
             int CurrentOverlapCountTest = Physics.OverlapBoxNonAlloc(
                 Player.Position + SenseOverlapLocations[CurrentOverlapLocation] * (Plugin.Radius.Value * 2f / 3f),
                 Vector3.one * (Plugin.Radius.Value * 2f / 3f),
-                CurrentOverlapLoctionColliders,
+                CurrentOverlapLocationColliders,
                 Quaternion.Euler(0f, 0f, 0f),
                 BoxInteractiveLayerMask,
                 QueryTriggerInteraction.Collide);
 
             for (int i = 0; i < CurrentOverlapCountTest; i++)
             {
-                if (!SenseWorlds.ContainsKey(CurrentOverlapLoctionColliders[i].GetInstanceID()))
+                if (!SenseWorlds.TryGetValue(CurrentOverlapLocationColliders[i].GetInstanceID(), out var sw))
                 {
                     GameObject SenseWorldGameObject = new("SenseWorld");
-                    AmandsSenseWorld amandsSenseWorld = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
-                    amandsSenseWorld.OwnerCollider = CurrentOverlapLoctionColliders[i];
-                    amandsSenseWorld.OwnerGameObject = amandsSenseWorld.OwnerCollider.gameObject;
-                    amandsSenseWorld.Id = amandsSenseWorld.OwnerCollider.GetInstanceID();
-                    amandsSenseWorld.Delay = Math.Min(0, Vector3.Distance(Player.Position, amandsSenseWorld.OwnerCollider.transform.position) / Plugin.Speed.Value);
-                    SenseWorlds.Add(amandsSenseWorld.Id, amandsSenseWorld);
+                    sw = SenseWorldGameObject.AddComponent<AmandsSenseWorld>();
+                    sw.OwnerCollider = CurrentOverlapLocationColliders[i];
+                    sw.OwnerGameObject = sw.OwnerCollider.gameObject;
+                    sw.Id = sw.OwnerCollider.GetInstanceID();
+                    sw.Delay = Math.Min(0, Vector3.Distance(Player.Position, sw.OwnerCollider.transform.position) / Plugin.Speed.Value);
+                    SenseWorlds.Add(sw.Id, sw);
                 }
-                else
-                    SenseWorlds[CurrentOverlapLoctionColliders[i].GetInstanceID()].RestartSense();
+
+                sw.RestartSense();
             }
 
             CurrentOverlapLocation++;
@@ -209,11 +209,10 @@ public class AmandsSenseClass : MonoBehaviour
         if (!Plugin.EnableExfilSense.Value)
             return;
 
-#warning Fix this
-        if (scene == "Factory_Day" || scene == "Factory_Night" || scene == "Laboratory_Scripts")
+        if (scene.Contains("Factory_") && scene.Contains("Laboratory_"))
             return;
 
-        float ClosestDistance = 10000000000f;
+        float ClosestDistance = 10_000_000_000f;
         if (ClosestAmandsSenseExfil != null && ClosestAmandsSenseExfil.light != null)
             ClosestAmandsSenseExfil.light.shadows = LightShadows.None;
 
@@ -241,7 +240,12 @@ public class AmandsSenseClass : MonoBehaviour
     public static void Clear()
     {
         foreach (var kv in SenseWorlds)
-            kv.Value?.RemoveSense();
+        {
+            if (kv.Value is null)
+                continue;
+
+            kv.Value.RemoveSense();
+        }
 
         SenseWorlds.Clear();
 
@@ -354,8 +358,7 @@ public class AmandsSenseClass : MonoBehaviour
         }
         finally
         {
-            if (writer != null)
-                writer.Close();
+            writer?.Close();
         }
     }
 
@@ -391,21 +394,17 @@ public class AmandsSenseClass : MonoBehaviour
 
     async static Task<Sprite> RequestSprite(string path)
     {
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);
+        var www = UnityWebRequestTexture.GetTexture(path);
         var SendWeb = www.SendWebRequest();
 
         while (!SendWeb.isDone)
             await Task.Yield();
 
-        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-        {
+        if (www.result != UnityWebRequest.Result.Success)
             return null;
-        }
-        else
-        {
-            Texture2D texture = ((DownloadHandlerTexture) www.downloadHandler).texture;
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            return sprite;
-        }
+
+        var texture = ((DownloadHandlerTexture) www.downloadHandler).texture;
+        var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        return sprite;
     }
 }

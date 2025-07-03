@@ -43,7 +43,7 @@ public class GameWorldStartedPostfixPatch : ModulePatch
         if (GameWorldAwakePrefixPatch.IsHideout)
             return;
 
-        Plugin.Log.LogInfo($"Found local player: {__instance.MainPlayer.ProfileId}");
+        Plugin.Log.LogDebug($"Found local player: {__instance.MainPlayer.ProfileId}");
 
         AmandsSenseClass.isFactory = __instance.LocationId.Contains("factory");
         AmandsSenseClass.Player = __instance.MainPlayer;
@@ -55,7 +55,7 @@ public class GameWorldStartedPostfixPatch : ModulePatch
         __instance.gameObject.AddComponent<AmandsSenseClass>();
 
         if (AmandsSenseClass.isFactory)
-            Plugin.Log.LogInfo("Factory location detected");
+            Plugin.Log.LogDebug("Factory location detected");
 
         //if (MegamodPlugin.LodOverrideEnabled.Value)
         //    QualitySettings.lodBias = MegamodPlugin.LodBias.Value;
@@ -72,7 +72,7 @@ public class GameWorldDisposePostfixPatch : ModulePatch
     [PatchPostfix]
     public static void Postfix()
     {
-        Plugin.Log.LogInfo("Disposing of static & long lived objects.");
+        Plugin.Log.LogDebug("Disposing of static & long lived objects.");
 
         AmandsSenseClass.inventoryControllerClass = null;
         AmandsSenseClass.Player = null;
@@ -93,6 +93,6 @@ public class GameWorldDisposePostfixPatch : ModulePatch
         //ImpactStatic.LocalPlayer = null;
         //ImpactStatic.PlayerHitInfo = null;
 
-        Plugin.Log.LogInfo("Disposing complete.");
+        Plugin.Log.LogDebug("Disposing complete.");
     }
 }
