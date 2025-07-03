@@ -1,1 +1,1 @@
-public static class BuildInfo  {  public const string ModVersion = "4.0.0";  }
+public static class BuildInfo  {  public const string ModVersion = "3.0.0";  }

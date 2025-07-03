@@ -7,7 +7,7 @@ namespace AmandsSense;
 public class AmandsSenseHelper
 {
     public static string Localized(string id, EStringCase @case)
-        => GClass2175.Localized(id, @case);
+        => GClass2112.Localized(id, @case);
 
     public static bool IsBoss(WildSpawnType role)
         => role.IsBoss();
@@ -22,8 +22,8 @@ public class AmandsSenseHelper
         => role.GetScavRoleKey();
 
     public static string Transliterate(string text)
-        => GClass950.Transliterate(text);
+        => GClass930.Transliterate(text);
 
     public static Color ToColor(TaxonomyColor taxonomyColor)
-        => GClass1403.ToColor(taxonomyColor);
+        => GClass1338.ToColor(taxonomyColor);
 }
