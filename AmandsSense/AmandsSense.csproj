@@ -3,7 +3,7 @@
   <!-- Change version here -->
   <PropertyGroup>
     <Version>4.0.0</Version>
-    <InformationalVersion>pre07</InformationalVersion>
+    <InformationalVersion></InformationalVersion>
     <Company>Amanda</Company>
     <AssemblyName>Amand's Sense</AssemblyName>
     <Product>SPT 4.0, EFT 0.16.7.1.37759</Product>
